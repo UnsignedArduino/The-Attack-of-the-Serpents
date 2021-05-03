@@ -1,0 +1,31 @@
+{
+    "name": "The Attack of the Serpents",
+    "description": "",
+    "dependencies": {
+        "device": "*",
+        "Timers": "github:microsoft/arcade-timers#v1.1.0",
+        "arcade-sprite-util": "github:jwunderl/arcade-sprite-util#v0.1.1",
+        "character-animations": "github:riknoll/character-animations#v0.3.0"
+    },
+    "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md",
+        "assets.json",
+        "tilemap.g.jres",
+        "tilemap.g.ts",
+        "images.g.jres",
+        "images.g.ts"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "targetVersions": {
+        "target": "1.4.41",
+        "targetId": "arcade"
+    },
+    "supportedTargets": [
+        "arcade"
+    ],
+    "preferredEditor": "blocksprj"
+}
