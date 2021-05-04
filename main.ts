@@ -212,10 +212,11 @@ color.Black
 )
 pause(100)
 if (controller.B.isPressed()) {
-    scene.setBackgroundColor(13)
-    fade_out(true)
+    scene.setBackgroundColor(12)
+    fade_out(false)
     story.showPlayerChoices("Reset everything!", "No keep my data!")
     if (story.getLastAnswer().includes("Reset")) {
+        blockSettings.clear()
         story.printCharacterText("Reset successful.")
         fade_in(true)
         game.reset()
@@ -224,6 +225,13 @@ if (controller.B.isPressed()) {
         fade_in(true)
     }
 }
+if (!(blockSettings.exists("name"))) {
+    scene.setBackgroundColor(12)
+    fade_out(true)
+    blockSettings.writeString("name", game.askForString("Please input a name: ", 24))
+    fade_in(true)
+}
+let name = blockSettings.readString("name")
 make_character()
 make_tilemap()
 tiles.placeOnTile(sprite_player, tiles.getTileLocation(17, 18))
