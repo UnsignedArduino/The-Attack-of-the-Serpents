@@ -75,6 +75,8 @@ function get_relative_ground_tile (column: number, row: number) {
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (can_skip_dialog) {
         story.clearAllText()
+    } else if (can_slow_time) {
+    	
     }
 })
 function overlapping_sprite_kind (overlap_sprite: Sprite, kind: number) {
@@ -200,6 +202,24 @@ function part_1_2 () {
     character.setCharacterState(sprite_player, character.rule(Predicate.FacingLeft, Predicate.NotMoving))
     fade_out(false)
     color.pauseUntilFadeDone()
+    can_skip_dialog = true
+    story.printCharacterText("" + name + ", I've been wanting to tell you this for a long time, but I didn't feel like you were ready for it until now.", "Village Leader")
+    story.printCharacterText("You have the ability to control time.", "Village Leader")
+    story.printCharacterText("Wait, WHAT? Is this some sort of sick joke you are playing on me???", name)
+    story.printCharacterText("No. I am serious. You can control time.", "Village Leader")
+    story.printCharacterText("Alright not really control as you (and I) can only slow it down. But it sounds cooler that way.", "Village Leader")
+    story.printCharacterText("Wait, you have that power too???", name)
+    story.printCharacterText("Yes.", "Village Leader")
+    story.printCharacterText("Wouldn't other people have noticed?", name)
+    story.printCharacterText("No, because everything, and I mean EVERYTHING slows down. Even a person's mind would slow down with everything else as well.", "Village Leader")
+    story.printCharacterText("But people who can slow down time, like you - they notice it as well.", "Village Leader")
+    story.printCharacterText("Believe it or not, I was actually young one time. Before I could slow down time and only require a 3 hour nap after. But now, I'm too old to do this stuff.", "Village Leader")
+    story.printCharacterText("If I was to do it, I would pass out for a whole week.", "Village Leader")
+    story.printCharacterText("Then how do I do it? Why did you tell me this?", name)
+    story.printCharacterText("I told you this because the Serpents on the other side of the river-", "Village Leader")
+    story.printCharacterText("The SERPENTS?!?!?", name)
+    story.printCharacterText("Yes, those snakes. Their leader wants to conquer everything, and this village is no exception. ", "Village Leader")
+    story.printCharacterText("I wanted to warn you before they att-", "Village Leader")
 }
 function enable_movement (en: boolean) {
     if (en) {
@@ -395,6 +415,7 @@ let sprite_overlapping: Sprite = null
 let sprite_player: Sprite = null
 let current_part = ""
 let name = ""
+let can_slow_time = false
 let enable_fighting = false
 let can_skip_dialog = false
 color.setPalette(
@@ -402,6 +423,7 @@ color.Black
 )
 can_skip_dialog = false
 enable_fighting = false
+can_slow_time = false
 pause(100)
 if (controller.B.isPressed()) {
     scene.setBackgroundColor(12)
