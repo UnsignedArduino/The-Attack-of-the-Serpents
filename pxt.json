@@ -10,7 +10,8 @@
         "tilemaps": "github:microsoft/pxt-tilemaps#v1.11.0",
         "settings-blocks": "github:microsoft/pxt-settings-blocks#v1.0.0",
         "Color Fading": "github:jwunderl/pxt-color#v0.2.1",
-        "arcade-story": "github:microsoft/arcade-storytelling#v1.0.1"
+        "arcade-story": "github:microsoft/arcade-storytelling#v1.0.1",
+        "arcade-tilemap-a-star": "github:jwunderl/arcade-tilemap-a-star#v0.3.5"
     },
     "files": [
         "main.blocks",

@@ -112,6 +112,12 @@ function make_villager () {
     100,
     character.rule(Predicate.FacingLeft)
     )
+    character.setCharacterAnimationsEnabled(sprite_villager, true)
+    // can be:
+    // - idle
+    // - walking (to somewhere)
+    // - panicking (to global target when under invasion)
+    sprites.setDataString(sprite_villager, "state", "idle")
     tiles.placeOnRandomTile(sprite_villager, random_path_tile())
 }
 function make_character () {
@@ -325,6 +331,7 @@ sprite_player.x += tiles.tileWidth() / 2
 for (let index = 0; index < 20; index++) {
     make_villager()
 }
+pause(100)
 fade_out(false)
 game.onUpdate(function () {
     for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
@@ -335,5 +342,26 @@ game.onUpdate(function () {
     }
     for (let sprite of sprites.allOfKind(SpriteKind.Thing)) {
         sprite.z = sprite.bottom
+    }
+    for (let sprite of sprites.allOfKind(SpriteKind.Villager)) {
+        sprite.z = sprite.bottom
+    }
+})
+forever(function () {
+    for (let sprite_villager of sprites.allOfKind(SpriteKind.Villager)) {
+        if (sprites.readDataString(sprite_villager, "state") == "panicking") {
+            continue;
+        }
+        if (sprites.readDataString(sprite_villager, "state") == "idle") {
+            if (Math.percentChance(50)) {
+                sprites.setDataString(sprite_villager, "state", "walking")
+                scene.followPath(sprite_villager, scene.aStar(tiles.locationOfSprite(sprite_villager), tiles.getTilesByType(random_path_tile())._pickRandom()), 50)
+            }
+        } else {
+            if (!(character.matchesRule(sprite_villager, character.rule(Predicate.Moving)))) {
+                sprites.setDataString(sprite_villager, "state", "idle")
+            }
+        }
+        pause(randint(100, 500))
     }
 })
