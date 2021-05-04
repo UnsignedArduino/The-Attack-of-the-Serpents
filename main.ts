@@ -15,8 +15,18 @@ function place_thing (image2: Image, column: number, row: number) {
     sprite_thing = sprites.create(image2, SpriteKind.Thing)
     sprite_thing.setFlag(SpriteFlag.Ghost, true)
     tiles.placeOnTile(sprite_thing, tiles.getTileLocation(column, row))
-    tiles.setTileAt(tiles.getTileLocation(column, row), assets.tile`grass`)
+    tiles.setTileAt(tiles.getTileLocation(column, row), get_relative_ground_tile(column, row))
     tiles.setWallAt(tiles.getTileLocation(column, row), true)
+}
+function get_relative_ground_tile (column: number, row: number) {
+    for (let direction of [CollisionDirection.Top, CollisionDirection.Right, CollisionDirection.Bottom, CollisionDirection.Left]) {
+        if (tiles.tileIs(tiles.locationInDirection(tiles.getTileLocation(column, row), direction), assets.tile`grass`)) {
+            return assets.tile`grass`
+        } else if (tiles.tileIs(tiles.locationInDirection(tiles.getTileLocation(column, row), direction), assets.tile`dark_grass`)) {
+            return assets.tile`dark_grass`
+        }
+    }
+    return assets.tile`grass`
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     use_sword()
@@ -25,7 +35,7 @@ function place_floor_thing (image2: Image, column: number, row: number) {
     sprite_thing = sprites.create(image2, SpriteKind.Thing)
     sprite_thing.setFlag(SpriteFlag.Ghost, true)
     tiles.placeOnTile(sprite_thing, tiles.getTileLocation(column, row))
-    tiles.setTileAt(tiles.getTileLocation(column, row), assets.tile`grass`)
+    tiles.setTileAt(tiles.getTileLocation(column, row), get_relative_ground_tile(column, row))
 }
 function make_character () {
     sprite_player = sprites.create(assets.image`character_front`, SpriteKind.Player)
@@ -87,6 +97,9 @@ function make_tilemap () {
     for (let location of tiles.getTilesByType(sprites.castle.rock1)) {
         tiles.setWallAt(location, true)
     }
+    for (let location of tiles.getTilesByType(assets.tile`water`)) {
+        tiles.setWallAt(location, true)
+    }
     for (let location of tiles.getTilesByType(assets.tile`tree_1`)) {
         place_thing(assets.image`tree_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
         sprite_thing.y += -8
@@ -120,11 +133,45 @@ function make_tilemap () {
         place_thing(assets.image`stump_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
     }
     for (let location of tiles.getTilesByType(assets.tile`house_1`)) {
-        place_thing(assets.image`house_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        place_thing(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
         house_walls_around(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
     }
     for (let location of tiles.getTilesByType(assets.tile`house_2`)) {
-        place_thing(assets.image`house_2`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        place_thing(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
         house_walls_around(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
     }
 }
