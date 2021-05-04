@@ -1,6 +1,16 @@
 namespace SpriteKind {
     export const Thing = SpriteKind.create()
 }
+function house_walls_around (column: number, row: number) {
+    tiles.setWallAt(tiles.getTileLocation(column - 1, row - 1), true)
+    tiles.setWallAt(tiles.getTileLocation(column, row - 1), true)
+    tiles.setWallAt(tiles.getTileLocation(column + 1, row - 1), true)
+    tiles.setWallAt(tiles.getTileLocation(column - 1, row), true)
+    tiles.setWallAt(tiles.getTileLocation(column, row), true)
+    tiles.setWallAt(tiles.getTileLocation(column + 1, row), true)
+    tiles.setWallAt(tiles.getTileLocation(column - 1, row + 1), true)
+    tiles.setWallAt(tiles.getTileLocation(column + 1, row + 1), true)
+}
 function place_thing (image2: Image, column: number, row: number) {
     sprite_thing = sprites.create(image2, SpriteKind.Thing)
     sprite_thing.setFlag(SpriteFlag.Ghost, true)
@@ -108,6 +118,14 @@ function make_tilemap () {
     }
     for (let location of tiles.getTilesByType(assets.tile`stump_1`)) {
         place_thing(assets.image`stump_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+    }
+    for (let location of tiles.getTilesByType(assets.tile`house_1`)) {
+        place_thing(assets.image`house_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        house_walls_around(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+    }
+    for (let location of tiles.getTilesByType(assets.tile`house_2`)) {
+        place_thing(assets.image`house_2`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        house_walls_around(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
     }
 }
 function animate_character () {
