@@ -29,8 +29,22 @@ function get_relative_ground_tile (column: number, row: number) {
     return assets.tile`grass`
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    use_sword()
+    if (sprite_player) {
+        use_sword()
+    }
 })
+function fade_out (block: boolean) {
+    color.startFade(color.Black, color.originalPalette, 2000)
+    if (block) {
+        color.pauseUntilFadeDone()
+    }
+}
+function fade_in (block: boolean) {
+    color.startFade(color.originalPalette, color.Black, 2000)
+    if (block) {
+        color.pauseUntilFadeDone()
+    }
+}
 function place_floor_thing (image2: Image, column: number, row: number) {
     sprite_thing = sprites.create(image2, SpriteKind.Thing)
     sprite_thing.setFlag(SpriteFlag.Ghost, true)
@@ -133,45 +147,11 @@ function make_tilemap () {
         place_thing(assets.image`stump_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
     }
     for (let location of tiles.getTilesByType(assets.tile`house_1`)) {
-        place_thing(img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        place_thing(assets.image`house_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
         house_walls_around(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
     }
     for (let location of tiles.getTilesByType(assets.tile`house_2`)) {
-        place_thing(img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        place_thing(assets.image`house_2`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
         house_walls_around(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
     }
 }
@@ -225,10 +205,31 @@ function animate_character () {
     character.rule(Predicate.NotMoving, Predicate.FacingLeft)
     )
 }
-let sprite_player: Sprite = null
 let sprite_thing: Sprite = null
+let sprite_player: Sprite = null
+color.setPalette(
+color.Black
+)
+pause(100)
+if (controller.B.isPressed()) {
+    scene.setBackgroundColor(13)
+    fade_out(true)
+    story.showPlayerChoices("Reset everything!", "No keep my data!")
+    if (story.getLastAnswer().includes("Reset")) {
+        story.printCharacterText("Reset successful.")
+        fade_in(true)
+        game.reset()
+    } else {
+        story.printCharacterText("No reset was performed.")
+        fade_in(true)
+    }
+}
 make_character()
 make_tilemap()
+tiles.placeOnTile(sprite_player, tiles.getTileLocation(17, 18))
+sprite_player.y += tiles.tileWidth() / 2
+sprite_player.x += tiles.tileWidth() / 2
+fade_out(false)
 game.onUpdate(function () {
     for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
         sprite.z = sprite.bottom - 8

@@ -7,7 +7,10 @@
         "arcade-sprite-util": "github:jwunderl/arcade-sprite-util#v0.1.1",
         "character-animations": "github:riknoll/character-animations#v0.3.0",
         "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.1.0",
-        "tilemaps": "github:microsoft/pxt-tilemaps#v1.11.0"
+        "tilemaps": "github:microsoft/pxt-tilemaps#v1.11.0",
+        "settings-blocks": "github:microsoft/pxt-settings-blocks#v1.0.0",
+        "Color Fading": "github:jwunderl/pxt-color#v0.2.1",
+        "arcade-story": "github:microsoft/arcade-storytelling#v1.0.1"
     },
     "files": [
         "main.blocks",
