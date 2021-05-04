@@ -47,7 +47,7 @@ function part_1_1 () {
     character.setCharacterState(sprite_leader, character.rule(Predicate.FacingDown))
     pause(1000)
     story.printCharacterText("Ah, hello there " + name + ". Today's the day. Come on, we have much to discuss. Follow me.", "Village Leader")
-    path = scene.aStar(tiles.locationOfSprite(sprite_leader), tiles.getTileLocation(16, 14))
+    path = scene.aStar(tiles.locationOfSprite(sprite_leader), tiles.getTileLocation(13, 12))
     pause(500)
     scene.cameraFollowSprite(null)
     character.clearCharacterState(sprite_leader)
@@ -55,6 +55,7 @@ function part_1_1 () {
     pause(500)
     scene.followPath(sprite_player, path, 50)
     fade_in(true)
+    sprite_leader.destroy()
     scene.cameraFollowSprite(sprite_player)
 }
 function place_thing (image2: Image, column: number, row: number) {
@@ -90,9 +91,19 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     }
 })
 function part_1 () {
-    if (current_part == "1.1") {
-        part_1_1()
-        save_part("1.2")
+    if (false) {
+        if (current_part == "1.1") {
+            part_1_1()
+            save_part("1.2")
+            pause(1000)
+        }
+        if (current_part == "1.2") {
+            part_1_2()
+            save_part("1.3")
+            pause(1000)
+        }
+    } else {
+        part_1_2()
     }
 }
 function fade_out (block: boolean) {
@@ -178,6 +189,17 @@ function make_villager (picture_index: number, do_wandering: boolean) {
     sprites.setDataBoolean(sprite_villager, "do_wandering", do_wandering)
     tiles.placeOnRandomTile(sprite_villager, random_path_tile())
     return sprite_villager
+}
+function part_1_2 () {
+    sprite_leader = make_villager(3, false)
+    tiles.placeOnTile(sprite_leader, tiles.getTileLocation(13, 12))
+    tiles.placeOnTile(sprite_player, tiles.getTileLocation(14, 12))
+    scene.followPath(sprite_leader, scene.aStar(tiles.getTileLocation(0, 0), tiles.getTileLocation(0, 0)), 0)
+    scene.followPath(sprite_player, scene.aStar(tiles.getTileLocation(0, 0), tiles.getTileLocation(0, 0)), 0)
+    character.setCharacterState(sprite_leader, character.rule(Predicate.FacingRight))
+    character.setCharacterState(sprite_player, character.rule(Predicate.FacingLeft, Predicate.NotMoving))
+    fade_out(false)
+    color.pauseUntilFadeDone()
 }
 function enable_movement (en: boolean) {
     if (en) {
