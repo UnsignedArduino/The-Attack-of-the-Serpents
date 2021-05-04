@@ -1,12 +1,29 @@
+namespace SpriteKind {
+    export const Thing = SpriteKind.create()
+}
+function place_thing (image2: Image, column: number, row: number) {
+    sprite_thing = sprites.create(image2, SpriteKind.Thing)
+    sprite_thing.setFlag(SpriteFlag.Ghost, true)
+    tiles.placeOnTile(sprite_thing, tiles.getTileLocation(column, row))
+    tiles.setTileAt(tiles.getTileLocation(column, row), assets.tile`grass`)
+    tiles.setWallAt(tiles.getTileLocation(column, row), true)
+}
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     use_sword()
 })
+function place_floor_thing (image2: Image, column: number, row: number) {
+    sprite_thing = sprites.create(image2, SpriteKind.Thing)
+    sprite_thing.setFlag(SpriteFlag.Ghost, true)
+    tiles.placeOnTile(sprite_thing, tiles.getTileLocation(column, row))
+    tiles.setTileAt(tiles.getTileLocation(column, row), assets.tile`grass`)
+}
 function make_character () {
     sprite_player = sprites.create(assets.image`character_front`, SpriteKind.Player)
     animate_character()
     sprites.setDataBoolean(sprite_player, "attacking", false)
     sprite_player.setFlag(SpriteFlag.StayInScreen, true)
     controller.moveSprite(sprite_player, 80, 80)
+    scene.cameraFollowSprite(sprite_player)
 }
 function use_sword () {
     timer.throttle("attack", 400, function () {
@@ -50,6 +67,48 @@ function use_sword () {
             character.setCharacterAnimationsEnabled(sprite_player, true)
         })
     })
+}
+function make_tilemap () {
+    scene.setBackgroundColor(7)
+    tiles.setTilemap(tilemap`level_1`)
+    for (let location of tiles.getTilesByType(sprites.castle.rock0)) {
+        tiles.setWallAt(location, true)
+    }
+    for (let location of tiles.getTilesByType(sprites.castle.rock1)) {
+        tiles.setWallAt(location, true)
+    }
+    for (let location of tiles.getTilesByType(assets.tile`tree_1`)) {
+        place_thing(assets.image`tree_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        sprite_thing.y += -8
+    }
+    for (let location of tiles.getTilesByType(assets.tile`tree_2`)) {
+        place_thing(assets.image`tree_2`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        sprite_thing.y += -8
+    }
+    for (let location of tiles.getTilesByType(assets.tile`tree_3`)) {
+        place_thing(assets.image`tree_3`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        sprite_thing.y += -8
+    }
+    for (let location of tiles.getTilesByType(assets.tile`tree_4`)) {
+        place_thing(assets.image`tree_4`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        sprite_thing.y += -4
+    }
+    for (let location of tiles.getTilesByType(assets.tile`tree_4`)) {
+        place_thing(assets.image`tree_4`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        sprite_thing.y += -4
+    }
+    for (let location of tiles.getTilesByType(assets.tile`flower_1`)) {
+        place_floor_thing(assets.image`flower_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+    }
+    for (let location of tiles.getTilesByType(assets.tile`flower_2`)) {
+        place_floor_thing(assets.image`flower_2`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+    }
+    for (let location of tiles.getTilesByType(assets.tile`mushroom_1`)) {
+        place_floor_thing(assets.image`mushroom_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+    }
+    for (let location of tiles.getTilesByType(assets.tile`stump_1`)) {
+        place_thing(assets.image`stump_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+    }
 }
 function animate_character () {
     character.loopFrames(
@@ -102,5 +161,17 @@ function animate_character () {
     )
 }
 let sprite_player: Sprite = null
-scene.setBackgroundColor(7)
+let sprite_thing: Sprite = null
 make_character()
+make_tilemap()
+game.onUpdate(function () {
+    for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
+        sprite.z = sprite.bottom - 8
+    }
+    for (let sprite of sprites.allOfKind(SpriteKind.Enemy)) {
+        sprite.z = sprite.bottom
+    }
+    for (let sprite of sprites.allOfKind(SpriteKind.Thing)) {
+        sprite.z = sprite.bottom
+    }
+})
