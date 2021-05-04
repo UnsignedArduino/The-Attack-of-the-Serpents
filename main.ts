@@ -1,5 +1,6 @@
 namespace SpriteKind {
     export const Thing = SpriteKind.create()
+    export const Villager = SpriteKind.create()
 }
 function house_walls_around (column: number, row: number) {
     tiles.setWallAt(tiles.getTileLocation(column - 1, row - 1), true)
@@ -55,6 +56,63 @@ function place_floor_thing (image2: Image, column: number, row: number) {
     sprite_thing.setFlag(SpriteFlag.Ghost, true)
     tiles.placeOnTile(sprite_thing, tiles.getTileLocation(column, row))
     tiles.setTileAt(tiles.getTileLocation(column, row), get_relative_ground_tile(column, row))
+}
+function make_villager () {
+    villager_down_animations = [assets.animation`villager_1_walk_down`, assets.animation`villager_2_walk_down`, assets.animation`villager_3_walk_down`]
+    villager_up_animations = [assets.animation`villager_1_walk_up`, assets.animation`villager_2_walk_up`, assets.animation`villager_3_walk_up`]
+    villager_right_animations = [assets.animation`villager_1_walk_right`, assets.animation`villager_2_walk_right`, assets.animation`villager_3_walk_right`]
+    villager_left_animations = [assets.animation`villager_1_walk_left`, assets.animation`villager_2_walk_left`, assets.animation`villager_3_walk_left`]
+    villager_index = randint(0, villager_down_animations.length - 1)
+    sprite_villager = sprites.create(villager_down_animations[0][0], SpriteKind.Villager)
+    character.loopFrames(
+    sprite_villager,
+    villager_up_animations[villager_index],
+    100,
+    character.rule(Predicate.MovingUp)
+    )
+    character.loopFrames(
+    sprite_villager,
+    villager_right_animations[villager_index],
+    100,
+    character.rule(Predicate.MovingRight)
+    )
+    character.loopFrames(
+    sprite_villager,
+    villager_down_animations[villager_index],
+    100,
+    character.rule(Predicate.MovingDown)
+    )
+    character.loopFrames(
+    sprite_villager,
+    villager_left_animations[villager_index],
+    100,
+    character.rule(Predicate.MovingLeft)
+    )
+    character.runFrames(
+    sprite_villager,
+    [villager_up_animations[villager_index][0]],
+    100,
+    character.rule(Predicate.FacingUp)
+    )
+    character.runFrames(
+    sprite_villager,
+    [villager_right_animations[villager_index][0]],
+    100,
+    character.rule(Predicate.FacingRight)
+    )
+    character.runFrames(
+    sprite_villager,
+    [villager_down_animations[villager_index][0]],
+    100,
+    character.rule(Predicate.FacingDown)
+    )
+    character.runFrames(
+    sprite_villager,
+    [villager_left_animations[villager_index][0]],
+    100,
+    character.rule(Predicate.FacingLeft)
+    )
+    tiles.placeOnRandomTile(sprite_villager, random_path_tile())
 }
 function make_character () {
     sprite_player = sprites.create(assets.image`character_front`, SpriteKind.Player)
@@ -210,6 +268,25 @@ function animate_character () {
     character.rule(Predicate.NotMoving, Predicate.FacingLeft)
     )
 }
+function random_path_tile () {
+    return [
+    sprites.castle.tilePath5,
+    sprites.castle.tilePath1,
+    sprites.castle.tilePath2,
+    sprites.castle.tilePath3,
+    sprites.castle.tilePath8,
+    sprites.castle.tilePath9,
+    sprites.castle.tilePath4,
+    sprites.castle.tilePath7,
+    sprites.castle.tilePath6
+    ]._pickRandom()
+}
+let sprite_villager: Sprite = null
+let villager_index = 0
+let villager_left_animations: Image[][] = []
+let villager_right_animations: Image[][] = []
+let villager_up_animations: Image[][] = []
+let villager_down_animations: Image[][] = []
 let sprite_thing: Sprite = null
 let sprite_player: Sprite = null
 let can_skip_dialog = false
@@ -245,6 +322,9 @@ make_tilemap()
 tiles.placeOnTile(sprite_player, tiles.getTileLocation(17, 18))
 sprite_player.y += tiles.tileWidth() / 2
 sprite_player.x += tiles.tileWidth() / 2
+for (let index = 0; index < 20; index++) {
+    make_villager()
+}
 fade_out(false)
 game.onUpdate(function () {
     for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
