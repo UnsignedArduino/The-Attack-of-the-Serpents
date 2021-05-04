@@ -28,6 +28,11 @@ function get_relative_ground_tile (column: number, row: number) {
     }
     return assets.tile`grass`
 }
+controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (can_skip_dialog) {
+        story.clearAllText()
+    }
+})
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     if (sprite_player) {
         use_sword()
@@ -207,9 +212,11 @@ function animate_character () {
 }
 let sprite_thing: Sprite = null
 let sprite_player: Sprite = null
+let can_skip_dialog = false
 color.setPalette(
 color.Black
 )
+can_skip_dialog = false
 pause(100)
 if (controller.B.isPressed()) {
     scene.setBackgroundColor(12)
@@ -232,6 +239,7 @@ if (!(blockSettings.exists("name"))) {
     fade_in(true)
 }
 let name = blockSettings.readString("name")
+can_skip_dialog = true
 make_character()
 make_tilemap()
 tiles.placeOnTile(sprite_player, tiles.getTileLocation(17, 18))
