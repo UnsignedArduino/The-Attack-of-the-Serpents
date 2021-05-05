@@ -52,7 +52,7 @@ function part_1_1 () {
                 story.printCharacterText("*knock knock knock*", name)
                 timer.background(function () {
                     story.spriteMoveToLocation(sprite_player, sprite_player.x, sprite_player.y + tiles.tileWidth(), 80)
-                    character.setCharacterState(sprite_leader, character.rule(Predicate.FacingUp))
+                    character.setCharacterState(sprite_player, character.rule(Predicate.FacingUp, Predicate.NotMoving))
                 })
                 if (sprites.readDataBoolean(sprite_overlapping, "has_leader")) {
                     break;
@@ -129,7 +129,7 @@ function part_1 () {
             pause(1000)
         }
     } else {
-        part_1_2()
+    	
     }
 }
 function fade_out (block: boolean) {
@@ -244,6 +244,10 @@ function part_1_2 () {
     story.printCharacterText("The SERPENTS?!?!?", name)
     story.printCharacterText("Yes, those snakes. Their leader wants to conquer everything, and this village is no exception. ", "Village Leader")
     story.printCharacterText("I wanted to warn you before they att-", "Village Leader")
+    timer.background(function () {
+        Notification.waitForNotificationFinish()
+        Notification.notify("Drums play in the distance", 1, assets.image`closed_captioning_icon`)
+    })
     for (let index = 0; index < 24; index++) {
         music.thump.playUntilDone()
         music.rest(music.beat(BeatFraction.Half))
@@ -379,6 +383,12 @@ function make_tilemap () {
 function save_part (part: string) {
     current_part = part
     blockSettings.writeString("part", current_part)
+    timer.after(4000, function () {
+        timer.background(function () {
+            Notification.waitForNotificationFinish()
+            Notification.notify("Your progress has been saved! " + "(To reset, hold down B and press " + "reset.)" + "" + "", 1, assets.image`floppy_disc`)
+        })
+    })
 }
 function animate_character () {
     character.loopFrames(
