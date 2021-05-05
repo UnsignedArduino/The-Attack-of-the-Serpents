@@ -695,6 +695,11 @@ game.onUpdateInterval(200, function () {
             energy_level += 1
         }
     }
-    statusbars.getStatusBarAttachedTo(StatusBarKind.Energy, sprite_player).setFlag(SpriteFlag.Invisible, !(can_slow_time))
-    statusbars.getStatusBarAttachedTo(StatusBarKind.Energy, sprite_player).value = energy_level
+    if (sprite_player) {
+        status_bar = statusbars.getStatusBarAttachedTo(StatusBarKind.Energy, sprite_player)
+        if (status_bar) {
+            status_bar.setFlag(SpriteFlag.Invisible, !(can_slow_time))
+            status_bar.value = energy_level
+        }
+    }
 })
