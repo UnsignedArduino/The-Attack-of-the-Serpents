@@ -98,10 +98,12 @@ function get_relative_ground_tile (column: number, row: number) {
     return assets.tile`grass`
 }
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (can_skip_dialog) {
-        story.clearAllText()
-    } else if (can_slow_time) {
-    	
+    if (can_slow_time) {
+        if (slowing_time) {
+            slowing_time = false
+        } else if (energy_level > 0) {
+            slowing_time = true
+        }
     }
 })
 function make_serpent (column: number, row: number, health: number) {
@@ -132,6 +134,7 @@ function make_serpent (column: number, row: number, health: number) {
     )
     tiles.placeOnTile(sprite_serpent, tiles.getTileLocation(column, row))
     sprites.setDataSprite(sprite_serpent, "target", sprite_player)
+    sprites.setDataBoolean(sprite_serpent, "slowed_down", false)
     status_bar = statusbars.create(16, 2, StatusBarKind.EnemyHealth)
     status_bar.setColor(2, 0, 3)
     status_bar.setStatusBarFlag(StatusBarFlag.SmoothTransition, true)
@@ -263,13 +266,18 @@ function make_villager (picture_index: number, do_wandering: boolean) {
     character.setCharacterAnimationsEnabled(sprite_villager, true)
     sprites.setDataString(sprite_villager, "state", "idle")
     sprites.setDataBoolean(sprite_villager, "do_wandering", do_wandering)
+    sprites.setDataBoolean(sprite_villager, "slowed_down", false)
     tiles.placeOnRandomTile(sprite_villager, random_path_tile())
     return sprite_villager
 }
 function update_serpent (serpent: Sprite) {
     if (!(spriteutils.isDestroyed(sprites.readDataSprite(serpent, "target")))) {
         path = scene.aStar(tiles.locationOfSprite(serpent), tiles.locationOfSprite(sprites.readDataSprite(serpent, "target")))
-        scene.followPath(serpent, path, 50)
+        if (slowing_time) {
+            scene.followPath(serpent, path, 10)
+        } else {
+            scene.followPath(serpent, path, 50)
+        }
         if (spriteutils.distanceBetween(serpent, sprites.readDataSprite(serpent, "target")) < 48) {
             if (character.matchesRule(serpent, character.rule(Predicate.FacingLeft))) {
                 character.setCharacterAnimationsEnabled(serpent, false)
@@ -291,6 +299,7 @@ function update_serpent (serpent: Sprite) {
             sprite_fireball = sprites.create(assets.image`fireball`, SpriteKind.Projectile)
             sprite_fireball.setFlag(SpriteFlag.AutoDestroy, true)
             sprite_fireball.setFlag(SpriteFlag.DestroyOnWall, true)
+            sprites.setDataBoolean(sprite_fireball, "slowed_down", false)
             sprite_fireball.setPosition(serpent.x, serpent.y)
             spriteutils.setVelocityAtAngle(sprite_fireball, spriteutils.angleFrom(serpent, sprites.readDataSprite(serpent, "target")), 100)
             timer.after(300, function () {
@@ -469,7 +478,9 @@ function make_tilemap () {
     sprites.setDataBoolean(sprite_thing, "has_leader", true)
 }
 controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (!(Notification.isNotifying())) {
+    if (can_skip_dialog) {
+        story.clearAllText()
+    } else if (!(Notification.isNotifying())) {
         Notification.notify("The pause menu is not available.", 1, assets.image`big_x`)
     }
 })
@@ -614,6 +625,7 @@ let sprite_player: Sprite = null
 let current_part = ""
 let name = ""
 let energy_level = 0
+let slowing_time = false
 let can_slow_time = false
 let enable_fighting = false
 let can_skip_dialog = false
@@ -623,7 +635,7 @@ color.Black
 can_skip_dialog = false
 enable_fighting = false
 can_slow_time = false
-let slowing_time = false
+slowing_time = false
 energy_level = 100
 info.setLife(20)
 pause(100)
@@ -663,20 +675,10 @@ timer.background(function () {
     part_1()
 })
 game.onUpdate(function () {
-    for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
-        sprite.z = (sprite.bottom - 8) / 100
-    }
-    for (let sprite of sprites.allOfKind(SpriteKind.Projectile)) {
-        sprite.z = sprite.bottom / 100
-    }
-    for (let sprite of sprites.allOfKind(SpriteKind.Enemy)) {
-        sprite.z = sprite.bottom / 100
-    }
-    for (let sprite of sprites.allOfKind(SpriteKind.Thing)) {
-        sprite.z = sprite.bottom / 100
-    }
-    for (let sprite of sprites.allOfKind(SpriteKind.Villager)) {
-        sprite.z = sprite.bottom / 100
+    for (let kind of [SpriteKind.Player, SpriteKind.Projectile, SpriteKind.Enemy, SpriteKind.Thing, SpriteKind.Villager]) {
+        for (let sprite of sprites.allOfKind(kind)) {
+            sprite.z = (sprite.bottom - 8) / 100
+        }
     }
 })
 forever(function () {
@@ -686,6 +688,26 @@ forever(function () {
     } else {
         pause(100)
     }
+})
+forever(function () {
+    for (let kind of [SpriteKind.Enemy, SpriteKind.Projectile, SpriteKind.Villager]) {
+        for (let sprite of sprites.allOfKind(kind)) {
+            if (sprites.readDataBoolean(sprite, "slowed_down")) {
+                if (!(slowing_time)) {
+                    sprites.setDataBoolean(sprite, "slowed_down", false)
+                    sprite.vx = sprite.vx * 5
+                    sprite.vy = sprite.vy * 5
+                }
+            } else {
+                if (slowing_time) {
+                    sprites.setDataBoolean(sprite, "slowed_down", true)
+                    sprite.vx = sprite.vx * 0.2
+                    sprite.vy = sprite.vy * 0.2
+                }
+            }
+        }
+    }
+    pause(100)
 })
 game.onUpdateInterval(200, function () {
     if (slowing_time) {
