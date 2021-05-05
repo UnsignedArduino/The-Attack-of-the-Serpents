@@ -103,7 +103,7 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     	
     }
 })
-function make_serpent (column: number, row: number) {
+function make_serpent (column: number, row: number, health: number) {
     sprite_serpent = sprites.create(assets.animation`serpent_slither_right`[0], SpriteKind.Enemy)
     character.loopFrames(
     sprite_serpent,
@@ -130,6 +130,10 @@ function make_serpent (column: number, row: number) {
     character.rule(Predicate.FacingLeft)
     )
     tiles.placeOnTile(sprite_serpent, tiles.getTileLocation(column, row))
+    sprites.setDataSprite(sprite_serpent, "target", sprite_player)
+    sprites.setDataNumber(sprite_serpent, "health", health)
+    sprites.setDataNumber(sprite_serpent, "id", serpent_id)
+    serpent_id += 1
     return sprite_serpent
 }
 function overlapping_sprite_kind (overlap_sprite: Sprite, kind: number) {
@@ -241,14 +245,38 @@ function make_villager (picture_index: number, do_wandering: boolean) {
     character.rule(Predicate.FacingLeft)
     )
     character.setCharacterAnimationsEnabled(sprite_villager, true)
-    // can be:
-    // - idle
-    // - walking (to somewhere)
-    // - panicking (to global target when under invasion)
     sprites.setDataString(sprite_villager, "state", "idle")
     sprites.setDataBoolean(sprite_villager, "do_wandering", do_wandering)
     tiles.placeOnRandomTile(sprite_villager, random_path_tile())
     return sprite_villager
+}
+function update_serpent (serpent: Sprite) {
+    if (!(spriteutils.isDestroyed(sprites.readDataSprite(serpent, "target")))) {
+        path = scene.aStar(tiles.locationOfSprite(serpent), tiles.locationOfSprite(sprites.readDataSprite(serpent, "target")))
+        scene.followPath(serpent, path, 60)
+        if (spriteutils.distanceBetween(serpent, sprites.readDataSprite(serpent, "target")) < 30) {
+            if (character.matchesRule(serpent, character.rule(Predicate.FacingLeft))) {
+                character.setCharacterAnimationsEnabled(serpent, false)
+                animation.runImageAnimation(
+                serpent,
+                assets.animation`serpent_attack_left`,
+                100,
+                false
+                )
+            } else {
+                character.setCharacterAnimationsEnabled(serpent, false)
+                animation.runImageAnimation(
+                serpent,
+                assets.animation`serpent_attack_right`,
+                100,
+                false
+                )
+            }
+            timer.after(300, function () {
+                character.setCharacterAnimationsEnabled(serpent, true)
+            })
+        }
+    }
 }
 function part_1_2 () {
     sprite_leader = make_villager(3, false)
@@ -310,7 +338,6 @@ function make_character () {
     sprite_player = sprites.create(assets.image`character_front`, SpriteKind.Player)
     animate_character()
     sprites.setDataBoolean(sprite_player, "attacking", false)
-    sprite_player.setFlag(SpriteFlag.StayInScreen, true)
     scene.cameraFollowSprite(sprite_player)
 }
 function use_sword () {
@@ -414,6 +441,11 @@ function make_tilemap () {
     }
     sprites.setDataBoolean(sprite_thing, "has_leader", true)
 }
+controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(Notification.isNotifying())) {
+        Notification.notify("The pause menu is not available.", 1, assets.image`big_x`)
+    }
+})
 function save_part (part: string) {
     current_part = part
     blockSettings.writeString("part", current_part)
@@ -475,15 +507,23 @@ function animate_character () {
     )
 }
 function part_1_3 () {
-    enable_fighting = true
-    can_slow_time = true
     tiles.placeOnTile(sprite_player, tiles.getTileLocation(14, 12))
     fade_out(true)
-    enable_movement(true)
     story.printCharacterText("Well that was helpful.", name)
     story.printCharacterText("Oh no they are here.", name)
-    while (true) {
-        pause(100)
+    pause(1000)
+    make_serpent(0, 15, 1)
+    scene.cameraFollowSprite(make_serpent(0, 16, 1))
+    pause(1000)
+    enable_movement(true)
+    enable_fighting = true
+    can_slow_time = true
+    scene.cameraFollowSprite(sprite_player)
+    while (sprites.allOfKind(SpriteKind.Enemy).length > 0) {
+        for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
+            update_serpent(sprite_serpent)
+        }
+        pause(500)
     }
     fade_in(true)
 }
@@ -513,6 +553,7 @@ let sprite_overlapping: Sprite = null
 let sprite_player: Sprite = null
 let current_part = ""
 let name = ""
+let serpent_id = 0
 let can_slow_time = false
 let enable_fighting = false
 let can_skip_dialog = false
@@ -522,6 +563,7 @@ color.Black
 can_skip_dialog = false
 enable_fighting = false
 can_slow_time = false
+serpent_id = 0
 pause(100)
 if (controller.B.isPressed()) {
     scene.setBackgroundColor(12)
