@@ -1,6 +1,7 @@
 namespace SpriteKind {
     export const Thing = SpriteKind.create()
     export const Villager = SpriteKind.create()
+    export const Title = SpriteKind.create()
 }
 function house_walls_around (column: number, row: number) {
     tiles.setWallAt(tiles.getTileLocation(column - 1, row - 1), true)
@@ -175,9 +176,13 @@ function part_1 () {
             pause(1000)
         }
         if (current_part == "1.3") {
-            part_1_2()
-            save_part("2.1")
+            part_1_3()
+            save_part("1.4")
             pause(1000)
+        }
+        if (current_part == "1.4") {
+            save_part("1.4")
+            part_1_4()
         }
     } else {
         part_1_3()
@@ -533,6 +538,18 @@ function animate_character () {
     character.rule(Predicate.NotMoving, Predicate.FacingLeft)
     )
 }
+function part_1_4 () {
+    enable_movement(false)
+    enable_fighting = false
+    can_slow_time = false
+    sprite_end_screen = sprites.create(assets.image`part_1_end`, SpriteKind.Title)
+    sprite_end_screen.top = 0
+    sprite_end_screen.left = 0
+    sprite_end_screen.z = 100
+    sprite_end_screen.setFlag(SpriteFlag.RelativeToCamera, true)
+    sprite_end_screen.setFlag(SpriteFlag.Ghost, true)
+    fade_out(true)
+}
 function part_1_3 () {
     tiles.placeOnTile(sprite_player, tiles.getTileLocation(14, 12))
     info.setLife(20)
@@ -576,6 +593,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         }
     }
 })
+let sprite_end_screen: Sprite = null
 let sprite_fireball: Sprite = null
 let sprite_villager: Sprite = null
 let villager_left_animations: Image[][] = []
