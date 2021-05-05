@@ -132,8 +132,6 @@ function make_serpent (column: number, row: number, health: number) {
     )
     tiles.placeOnTile(sprite_serpent, tiles.getTileLocation(column, row))
     sprites.setDataSprite(sprite_serpent, "target", sprite_player)
-    sprites.setDataNumber(sprite_serpent, "id", serpent_id)
-    serpent_id += 1
     status_bar = statusbars.create(16, 2, StatusBarKind.EnemyHealth)
     status_bar.setColor(2, 0, 3)
     status_bar.setStatusBarFlag(StatusBarFlag.SmoothTransition, true)
@@ -361,6 +359,12 @@ function make_character () {
     sprite_player = sprites.create(assets.image`character_front`, SpriteKind.Player)
     animate_character()
     sprites.setDataBoolean(sprite_player, "attacking", false)
+    status_bar = statusbars.create(16, 2, StatusBarKind.Energy)
+    status_bar.value = energy_level
+    status_bar.max = 100
+    status_bar.setColor(3, 10, 13)
+    status_bar.setStatusBarFlag(StatusBarFlag.SmoothTransition, true)
+    status_bar.attachToSprite(sprite_player)
     scene.cameraFollowSprite(sprite_player)
 }
 function use_sword () {
@@ -609,7 +613,7 @@ let sprite_overlapping: Sprite = null
 let sprite_player: Sprite = null
 let current_part = ""
 let name = ""
-let serpent_id = 0
+let energy_level = 0
 let can_slow_time = false
 let enable_fighting = false
 let can_skip_dialog = false
@@ -619,7 +623,8 @@ color.Black
 can_skip_dialog = false
 enable_fighting = false
 can_slow_time = false
-serpent_id = 0
+let slowing_time = false
+energy_level = 100
 info.setLife(20)
 pause(100)
 if (controller.B.isPressed()) {
@@ -678,4 +683,18 @@ forever(function () {
     } else {
         pause(100)
     }
+})
+game.onUpdateInterval(200, function () {
+    if (slowing_time) {
+        energy_level += -1
+        if (energy_level <= 0) {
+            slowing_time = false
+        }
+    } else {
+        if (energy_level < 100 && Math.percentChance(10)) {
+            energy_level += 1
+        }
+    }
+    statusbars.getStatusBarAttachedTo(StatusBarKind.Energy, sprite_player).setFlag(SpriteFlag.Invisible, !(can_slow_time))
+    statusbars.getStatusBarAttachedTo(StatusBarKind.Energy, sprite_player).value = energy_level
 })
