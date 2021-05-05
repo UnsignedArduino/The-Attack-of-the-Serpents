@@ -117,7 +117,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     }
 })
 function part_1 () {
-    if (true) {
+    if (false) {
         if (current_part == "1.1") {
             part_1_1()
             save_part("1.2")
@@ -128,8 +128,13 @@ function part_1 () {
             save_part("1.3")
             pause(1000)
         }
+        if (current_part == "1.3") {
+            part_1_2()
+            save_part("2.1")
+            pause(1000)
+        }
     } else {
-    	
+        part_1_3()
     }
 }
 function fade_out (block: boolean) {
@@ -439,6 +444,19 @@ function animate_character () {
     100,
     character.rule(Predicate.NotMoving, Predicate.FacingLeft)
     )
+}
+function part_1_3 () {
+    enable_fighting = true
+    can_slow_time = true
+    tiles.placeOnTile(sprite_player, tiles.getTileLocation(14, 12))
+    fade_out(true)
+    enable_movement(true)
+    story.printCharacterText("Well that was helpful.", name)
+    story.printCharacterText("Oh no they are here.", name)
+    while (true) {
+        pause(100)
+    }
+    fade_in(true)
 }
 function random_path_tile () {
     return [
