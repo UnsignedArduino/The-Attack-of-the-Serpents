@@ -103,6 +103,35 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     	
     }
 })
+function make_serpent (column: number, row: number) {
+    sprite_serpent = sprites.create(assets.animation`serpent_slither_right`[0], SpriteKind.Enemy)
+    character.loopFrames(
+    sprite_serpent,
+    assets.animation`serpent_slither_right`,
+    100,
+    character.rule(Predicate.MovingRight)
+    )
+    character.loopFrames(
+    sprite_serpent,
+    assets.animation`serpent_slither_left`,
+    100,
+    character.rule(Predicate.MovingLeft)
+    )
+    character.runFrames(
+    sprite_serpent,
+    [assets.animation`serpent_slither_right`[0]],
+    100,
+    character.rule(Predicate.FacingRight)
+    )
+    character.runFrames(
+    sprite_serpent,
+    [assets.animation`serpent_slither_left`[0]],
+    100,
+    character.rule(Predicate.FacingLeft)
+    )
+    tiles.placeOnTile(sprite_serpent, tiles.getTileLocation(column, row))
+    return sprite_serpent
+}
 function overlapping_sprite_kind (overlap_sprite: Sprite, kind: number) {
     for (let sprite of sprites.allOfKind(kind)) {
         if (overlap_sprite.overlapsWith(sprite)) {
@@ -477,6 +506,7 @@ let villager_right_animations: Image[][] = []
 let villager_up_animations: Image[][] = []
 let villager_down_animations: Image[][] = []
 let sprite_thing: Sprite = null
+let sprite_serpent: Sprite = null
 let path: tiles.Location[] = []
 let sprite_leader: Sprite = null
 let sprite_overlapping: Sprite = null
