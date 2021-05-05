@@ -666,6 +666,9 @@ game.onUpdate(function () {
     for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
         sprite.z = (sprite.bottom - 8) / 100
     }
+    for (let sprite of sprites.allOfKind(SpriteKind.Projectile)) {
+        sprite.z = sprite.bottom / 100
+    }
     for (let sprite of sprites.allOfKind(SpriteKind.Enemy)) {
         sprite.z = sprite.bottom / 100
     }
