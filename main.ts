@@ -13,6 +13,30 @@ function house_walls_around (column: number, row: number) {
     tiles.setWallAt(tiles.getTileLocation(column + 1, row + 1), true)
 }
 function part_1_1 () {
+    for (let index = 0; index < 20; index++) {
+        make_villager(randint(0, 2), true)
+    }
+    timer.background(function () {
+        while (current_part == "1.1") {
+            for (let sprite_villager of sprites.allOfKind(SpriteKind.Villager)) {
+                if (sprites.readDataString(sprite_villager, "state") == "panicking") {
+                    continue;
+                }
+                if (sprites.readDataString(sprite_villager, "state") == "idle") {
+                    if (Math.percentChance(50) && sprites.readDataBoolean(sprite_villager, "do_wandering")) {
+                        sprites.setDataString(sprite_villager, "state", "walking")
+                        scene.followPath(sprite_villager, scene.aStar(tiles.locationOfSprite(sprite_villager), tiles.getTilesByType(random_path_tile())._pickRandom()), 50)
+                    }
+                } else {
+                    if (!(character.matchesRule(sprite_villager, character.rule(Predicate.Moving)))) {
+                        sprites.setDataString(sprite_villager, "state", "idle")
+                    }
+                }
+                pause(20)
+            }
+            pause(100)
+        }
+    })
     fade_out(false)
     color.pauseUntilFadeDone()
     can_skip_dialog = true
@@ -93,7 +117,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     }
 })
 function part_1 () {
-    if (false) {
+    if (true) {
         if (current_part == "1.1") {
             part_1_1()
             save_part("1.2")
@@ -220,6 +244,22 @@ function part_1_2 () {
     story.printCharacterText("The SERPENTS?!?!?", name)
     story.printCharacterText("Yes, those snakes. Their leader wants to conquer everything, and this village is no exception. ", "Village Leader")
     story.printCharacterText("I wanted to warn you before they att-", "Village Leader")
+    for (let index = 0; index < 24; index++) {
+        music.thump.playUntilDone()
+        music.rest(music.beat(BeatFraction.Half))
+    }
+    story.printCharacterText("Oh no today is the day. They are attacking. Go fend them off. I assume you know how to use a sword? ", "Village Leader")
+    story.printCharacterText("No not reall-", name)
+    story.printCharacterText("Then I will see you later. Good luck and hold them off until I get everyone to safety.", "Village Leader")
+    character.setCharacterState(sprite_player, character.rule(Predicate.FacingRight, Predicate.NotMoving))
+    character.clearCharacterState(sprite_leader)
+    scene.followPath(sprite_leader, scene.aStar(tiles.locationOfSprite(sprite_leader), tiles.getTileLocation(28, 26)), 60)
+    timer.background(function () {
+        story.printCharacterText("Wait no come back!!!", name)
+    })
+    fade_in(true)
+    sprite_leader.destroy()
+    character.clearCharacterState(sprite_player)
 }
 function enable_movement (en: boolean) {
     if (en) {
@@ -456,9 +496,6 @@ make_tilemap()
 tiles.placeOnTile(sprite_player, tiles.getTileLocation(17, 18))
 sprite_player.y += tiles.tileWidth() / 2
 sprite_player.x += tiles.tileWidth() / 2
-for (let index = 0; index < 20; index++) {
-    make_villager(randint(0, 2), true)
-}
 timer.background(function () {
     pause(100)
     part_1()
@@ -475,23 +512,5 @@ game.onUpdate(function () {
     }
     for (let sprite of sprites.allOfKind(SpriteKind.Villager)) {
         sprite.z = sprite.bottom / 100
-    }
-})
-forever(function () {
-    for (let sprite_villager of sprites.allOfKind(SpriteKind.Villager)) {
-        if (sprites.readDataString(sprite_villager, "state") == "panicking") {
-            continue;
-        }
-        if (sprites.readDataString(sprite_villager, "state") == "idle") {
-            if (Math.percentChance(50) && sprites.readDataBoolean(sprite_villager, "do_wandering")) {
-                sprites.setDataString(sprite_villager, "state", "walking")
-                scene.followPath(sprite_villager, scene.aStar(tiles.locationOfSprite(sprite_villager), tiles.getTilesByType(random_path_tile())._pickRandom()), 50)
-            }
-        } else {
-            if (!(character.matchesRule(sprite_villager, character.rule(Predicate.Moving)))) {
-                sprites.setDataString(sprite_villager, "state", "idle")
-            }
-        }
-        pause(20)
     }
 })
