@@ -149,6 +149,12 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         use_sword()
     }
 })
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Player, function (sprite, otherSprite) {
+    sprite.destroy()
+    if (!(sprites.readDataBoolean(otherSprite, "attacking"))) {
+        scene.cameraShake(4, 500)
+    }
+})
 function part_1 () {
     if (false) {
         if (current_part == "1.1") {
@@ -253,7 +259,7 @@ function make_villager (picture_index: number, do_wandering: boolean) {
 function update_serpent (serpent: Sprite) {
     if (!(spriteutils.isDestroyed(sprites.readDataSprite(serpent, "target")))) {
         path = scene.aStar(tiles.locationOfSprite(serpent), tiles.locationOfSprite(sprites.readDataSprite(serpent, "target")))
-        scene.followPath(serpent, path, 60)
+        scene.followPath(serpent, path, 50)
         if (spriteutils.distanceBetween(serpent, sprites.readDataSprite(serpent, "target")) < 30) {
             if (character.matchesRule(serpent, character.rule(Predicate.FacingLeft))) {
                 character.setCharacterAnimationsEnabled(serpent, false)
@@ -272,6 +278,11 @@ function update_serpent (serpent: Sprite) {
                 false
                 )
             }
+            sprite_fireball = sprites.create(assets.image`fireball`, SpriteKind.Projectile)
+            sprite_fireball.setFlag(SpriteFlag.AutoDestroy, true)
+            sprite_fireball.setFlag(SpriteFlag.DestroyOnWall, true)
+            sprite_fireball.setPosition(serpent.x, serpent.y)
+            spriteutils.setVelocityAtAngle(sprite_fireball, spriteutils.angleFrom(serpent, sprites.readDataSprite(serpent, "target")), 60)
             timer.after(300, function () {
                 character.setCharacterAnimationsEnabled(serpent, true)
             })
@@ -540,6 +551,15 @@ function random_path_tile () {
     sprites.castle.tilePath6
     ]._pickRandom()
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
+    if (sprites.readDataBoolean(sprite, "attacking")) {
+        sprites.changeDataNumberBy(otherSprite, "health", -1)
+        if (sprites.readDataNumber(otherSprite, "health") <= 0) {
+            otherSprite.destroy(effects.disintegrate, 100)
+        }
+    }
+})
+let sprite_fireball: Sprite = null
 let sprite_villager: Sprite = null
 let villager_left_animations: Image[][] = []
 let villager_right_animations: Image[][] = []
