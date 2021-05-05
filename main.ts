@@ -34,7 +34,7 @@ function part_1_1 () {
                 }
                 pause(20)
             }
-            pause(100)
+            pause(500)
         }
     })
     fade_out(false)
@@ -131,9 +131,15 @@ function make_serpent (column: number, row: number, health: number) {
     )
     tiles.placeOnTile(sprite_serpent, tiles.getTileLocation(column, row))
     sprites.setDataSprite(sprite_serpent, "target", sprite_player)
-    sprites.setDataNumber(sprite_serpent, "health", health)
     sprites.setDataNumber(sprite_serpent, "id", serpent_id)
     serpent_id += 1
+    status_bar = statusbars.create(16, 2, StatusBarKind.EnemyHealth)
+    status_bar.setColor(2, 0, 3)
+    status_bar.setStatusBarFlag(StatusBarFlag.SmoothTransition, true)
+    status_bar.attachToSprite(sprite_serpent)
+    status_bar.value = health
+    status_bar.max = health
+    status_bar.setFlag(SpriteFlag.Ghost, true)
     return sprite_serpent
 }
 function overlapping_sprite_kind (overlap_sprite: Sprite, kind: number) {
@@ -153,6 +159,7 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Player, function (sprite, ot
     sprite.destroy()
     if (!(sprites.readDataBoolean(otherSprite, "attacking"))) {
         scene.cameraShake(4, 500)
+        info.changeLifeBy(-2)
     }
 })
 function part_1 () {
@@ -260,7 +267,7 @@ function update_serpent (serpent: Sprite) {
     if (!(spriteutils.isDestroyed(sprites.readDataSprite(serpent, "target")))) {
         path = scene.aStar(tiles.locationOfSprite(serpent), tiles.locationOfSprite(sprites.readDataSprite(serpent, "target")))
         scene.followPath(serpent, path, 50)
-        if (spriteutils.distanceBetween(serpent, sprites.readDataSprite(serpent, "target")) < 30) {
+        if (spriteutils.distanceBetween(serpent, sprites.readDataSprite(serpent, "target")) < 48) {
             if (character.matchesRule(serpent, character.rule(Predicate.FacingLeft))) {
                 character.setCharacterAnimationsEnabled(serpent, false)
                 animation.runImageAnimation(
@@ -282,7 +289,7 @@ function update_serpent (serpent: Sprite) {
             sprite_fireball.setFlag(SpriteFlag.AutoDestroy, true)
             sprite_fireball.setFlag(SpriteFlag.DestroyOnWall, true)
             sprite_fireball.setPosition(serpent.x, serpent.y)
-            spriteutils.setVelocityAtAngle(sprite_fireball, spriteutils.angleFrom(serpent, sprites.readDataSprite(serpent, "target")), 60)
+            spriteutils.setVelocityAtAngle(sprite_fireball, spriteutils.angleFrom(serpent, sprites.readDataSprite(serpent, "target")), 100)
             timer.after(300, function () {
                 character.setCharacterAnimationsEnabled(serpent, true)
             })
@@ -457,6 +464,15 @@ controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
         Notification.notify("The pause menu is not available.", 1, assets.image`big_x`)
     }
 })
+info.onLifeZero(function () {
+    timer.throttle("die", 3000, function () {
+        timer.background(function () {
+            sprite_player.destroy(effects.disintegrate, 100)
+            fade_in(true)
+            game.reset()
+        })
+    })
+})
 function save_part (part: string) {
     current_part = part
     blockSettings.writeString("part", current_part)
@@ -519,6 +535,7 @@ function animate_character () {
 }
 function part_1_3 () {
     tiles.placeOnTile(sprite_player, tiles.getTileLocation(14, 12))
+    info.setLife(20)
     fade_out(true)
     story.printCharacterText("Well that was helpful.", name)
     story.printCharacterText("Oh no they are here.", name)
@@ -553,8 +570,8 @@ function random_path_tile () {
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     if (sprites.readDataBoolean(sprite, "attacking")) {
-        sprites.changeDataNumberBy(otherSprite, "health", -1)
-        if (sprites.readDataNumber(otherSprite, "health") <= 0) {
+        statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value += -1
+        if (statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value <= 0) {
             otherSprite.destroy(effects.disintegrate, 100)
         }
     }
@@ -566,6 +583,7 @@ let villager_right_animations: Image[][] = []
 let villager_up_animations: Image[][] = []
 let villager_down_animations: Image[][] = []
 let sprite_thing: Sprite = null
+let status_bar: StatusBarSprite = null
 let sprite_serpent: Sprite = null
 let path: tiles.Location[] = []
 let sprite_leader: Sprite = null
@@ -584,6 +602,7 @@ can_skip_dialog = false
 enable_fighting = false
 can_slow_time = false
 serpent_id = 0
+info.setLife(20)
 pause(100)
 if (controller.B.isPressed()) {
     scene.setBackgroundColor(12)
@@ -632,5 +651,13 @@ game.onUpdate(function () {
     }
     for (let sprite of sprites.allOfKind(SpriteKind.Villager)) {
         sprite.z = sprite.bottom / 100
+    }
+})
+forever(function () {
+    if (info.life() < 20) {
+        pause(randint(1, 20) * 100)
+        info.changeLifeBy(1)
+    } else {
+        pause(100)
     }
 })
