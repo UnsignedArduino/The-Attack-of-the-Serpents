@@ -164,6 +164,14 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Player, function (sprite, ot
         info.changeLifeBy(-2)
     }
 })
+function wait_all_snakes_killed () {
+    while (sprites.allOfKind(SpriteKind.Enemy).length > 0) {
+        for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
+            update_serpent(sprite_serpent)
+        }
+        pause(500)
+    }
+}
 function part_1 () {
     if (false) {
         if (current_part == "1.1") {
@@ -493,6 +501,18 @@ info.onLifeZero(function () {
         })
     })
 })
+function camera_glide_to (_from: Sprite, to: Sprite, speed: number) {
+    if (!(sprite_camera)) {
+        sprite_camera = sprites.create(assets.image`blank`, SpriteKind.Player)
+    }
+    sprite_camera.setPosition(_from.x, _from.y)
+    sprite_camera.setFlag(SpriteFlag.Ghost, true)
+    scene.cameraFollowSprite(sprite_camera)
+    story.spriteMoveToLocation(sprite_camera, to.x, to.y, speed)
+    if (sprite_camera) {
+        sprite_camera.destroy()
+    }
+}
 function save_part (part: string) {
     current_part = part
     blockSettings.writeString("part", current_part)
@@ -567,24 +587,37 @@ function part_1_4 () {
 }
 function part_1_3 () {
     tiles.placeOnTile(sprite_player, tiles.getTileLocation(14, 12))
+    character.setCharacterState(sprite_player, character.rule(Predicate.FacingDown, Predicate.NotMoving))
+    make_serpent(0, 15, 2)
+    make_serpent(0, 16, 2)
+    for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
+        sprite_serpent.setFlag(SpriteFlag.GhostThroughWalls, true)
+        sprite_serpent.x += tiles.tileWidth() * -1
+    }
     info.setLife(20)
     fade_out(true)
     story.printCharacterText("Well that was helpful.", name)
     story.printCharacterText("Oh no they are here.", name)
     pause(1000)
-    make_serpent(0, 15, 1)
-    scene.cameraFollowSprite(make_serpent(0, 16, 1))
+    camera_glide_to(sprite_player, sprites.allOfKind(SpriteKind.Enemy)[0], 100)
     pause(1000)
+    for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
+        timer.background(function () {
+            story.spriteMoveToLocation(sprite_serpent, sprite_serpent.x + (tiles.tileWidth() + 8), sprite_serpent.y, 50)
+        })
+    }
+    pause(1000)
+    for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
+        sprite_serpent.setFlag(SpriteFlag.GhostThroughWalls, false)
+    }
     enable_movement(true)
+    character.clearCharacterState(sprite_player)
     enable_fighting = true
     can_slow_time = true
     scene.cameraFollowSprite(sprite_player)
-    while (sprites.allOfKind(SpriteKind.Enemy).length > 0) {
-        for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
-            update_serpent(sprite_serpent)
-        }
-        pause(500)
-    }
+    wait_all_snakes_killed()
+    can_slow_time = false
+    slowing_time = false
     fade_in(true)
 }
 function random_path_tile () {
@@ -609,6 +642,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
     }
 })
 let sprite_end_screen: Sprite = null
+let sprite_camera: Sprite = null
 let sprite_fireball: Sprite = null
 let sprite_villager: Sprite = null
 let villager_left_animations: Image[][] = []
