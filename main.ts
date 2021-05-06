@@ -50,7 +50,7 @@ function part_1_1 () {
     enable_movement(true)
     while (true) {
         sprite_overlapping = overlapping_sprite_kind(sprite_player, SpriteKind.Thing)
-        if (sprite_overlapping) {
+        if (sprite_overlapping && Math.abs(sprite_overlapping.bottom - sprite_player.y) < 4) {
             if (sprites.readDataBoolean(sprite_overlapping, "is_house")) {
                 enable_movement(false)
                 story.printCharacterText("*knock knock knock*", name)
