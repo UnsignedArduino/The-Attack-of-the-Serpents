@@ -134,6 +134,8 @@ function make_serpent (column: number, row: number, health: number) {
     )
     tiles.placeOnTile(sprite_serpent, tiles.getTileLocation(column, row))
     sprites.setDataSprite(sprite_serpent, "target", sprite_player)
+    sprites.setDataNumber(sprite_serpent, "id", sprite_id)
+    sprite_id += 1
     sprites.setDataBoolean(sprite_serpent, "slowed_down", false)
     status_bar = statusbars.create(16, 2, StatusBarKind.EnemyHealth)
     status_bar.setColor(2, 0, 3)
@@ -651,12 +653,14 @@ function random_path_tile () {
     ]._pickRandom()
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
-    if (sprites.readDataBoolean(sprite, "attacking")) {
-        statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value += -1
-        if (statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value <= 0) {
-            otherSprite.destroy(effects.disintegrate, 100)
+    timer.throttle("serpent_" + sprites.readDataNumber(otherSprite, "id") + "_take_damage", 500, function () {
+        if (sprites.readDataBoolean(sprite, "attacking")) {
+            statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value += -1
+            if (statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value <= 0) {
+                otherSprite.destroy(effects.disintegrate, 100)
+            }
         }
-    }
+    })
 })
 let sprite_end_screen: Sprite = null
 let sprite_camera: Sprite = null
@@ -675,6 +679,7 @@ let sprite_overlapping: Sprite = null
 let sprite_player: Sprite = null
 let current_part = ""
 let name = ""
+let sprite_id = 0
 let energy_level = 0
 let slowing_time = false
 let can_slow_time = false
@@ -688,6 +693,7 @@ can_fight = false
 can_slow_time = false
 slowing_time = false
 energy_level = 100
+sprite_id = 0
 info.setLife(20)
 pause(100)
 if (controller.B.isPressed()) {
