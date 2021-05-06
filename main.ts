@@ -579,7 +579,7 @@ function save_part (part: string) {
     timer.after(4000, function () {
         timer.background(function () {
             Notification.waitForNotificationFinish()
-            Notification.notify("Your progress has been saved! " + "(To reset, hold down B and press " + "reset.)" + "" + "", 1, assets.image`floppy_disc`)
+            Notification.notify("Your progress has been saved!", 1, assets.image`floppy_disc`)
         })
     })
 }
