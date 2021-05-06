@@ -38,6 +38,9 @@ function part_1_1 () {
             pause(500)
         }
     })
+    tiles.placeOnTile(sprite_player, tiles.getTileLocation(17, 18))
+    sprite_player.x += tiles.tileWidth() / 2
+    sprite_player.y += tiles.tileWidth() / 2
     fade_out(false)
     color.pauseUntilFadeDone()
     can_skip_dialog = true
@@ -78,6 +81,7 @@ function part_1_1 () {
     character.clearCharacterState(sprite_leader)
     scene.followPath(sprite_leader, path, 50)
     pause(500)
+    character.clearCharacterState(sprite_player)
     scene.followPath(sprite_player, path, 50)
     fade_in(true)
     sprite_leader.destroy()
@@ -175,7 +179,7 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Player, function (sprite, ot
     }
 })
 function part_1 () {
-    if (false) {
+    if (true) {
         if (current_part == "1.1") {
             make_part_1_tilemap()
             part_1_1()
@@ -507,8 +511,6 @@ function use_sword () {
 controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
     if (can_skip_dialog) {
         story.clearAllText()
-    } else if (!(Notification.isNotifying())) {
-        Notification.notify("The pause menu is not available.", 1, assets.image`big_x`)
     }
 })
 info.onLifeZero(function () {
@@ -754,7 +756,6 @@ can_slow_time = false
 slowing_time = false
 energy_level = 100
 sprite_id = 0
-info.setLife(20)
 pause(100)
 if (controller.B.isPressed()) {
     scene.setBackgroundColor(12)
@@ -776,6 +777,7 @@ if (!(blockSettings.exists("name"))) {
     blockSettings.writeString("name", game.askForString("Please input a name: ", 24))
     fade_in(true)
 }
+info.setLife(20)
 name = blockSettings.readString("name")
 if (!(blockSettings.exists("part"))) {
     blockSettings.writeString("part", "1.1")
