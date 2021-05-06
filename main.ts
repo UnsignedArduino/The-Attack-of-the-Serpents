@@ -141,6 +141,7 @@ function make_serpent (column: number, row: number, health: number) {
     sprites.setDataNumber(sprite_serpent, "id", sprite_id)
     sprite_id += 1
     sprites.setDataBoolean(sprite_serpent, "slowed_down", false)
+    multilights.addLightSource(sprite_serpent, 5)
     status_bar = statusbars.create(16, 2, StatusBarKind.EnemyHealth)
     status_bar.setColor(2, 0, 3)
     status_bar.setStatusBarFlag(StatusBarFlag.SmoothTransition, true)
@@ -177,6 +178,11 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Player, function (sprite, ot
         scene.cameraShake(4, 500)
         info.changeLifeBy(-2)
     }
+})
+controller.combos.attachCombo("urdlurdlurdlurdl", function () {
+    color.pauseUntilFadeDone()
+    dark_mode = !(dark_mode)
+    multilights.toggleLighting(dark_mode)
 })
 function part_1 () {
     if (true) {
@@ -258,12 +264,14 @@ function make_part_1_tilemap () {
     for (let location of tiles.getTilesByType(assets.tile`house_1`)) {
         place_thing(assets.image`house_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
         house_walls_around(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        multilights.addLightSource(sprite_thing, 15)
         sprites.setDataBoolean(sprite_thing, "is_house", true)
         sprite_thing.setFlag(SpriteFlag.GhostThroughSprites, false)
     }
     for (let location of tiles.getTilesByType(assets.tile`house_2`)) {
         place_thing(assets.image`house_2`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
         house_walls_around(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        multilights.addLightSource(sprite_thing, 15)
         sprites.setDataBoolean(sprite_thing, "is_house", true)
         sprite_thing.setFlag(SpriteFlag.GhostThroughSprites, false)
     }
@@ -357,6 +365,7 @@ function make_villager (picture_index: number, do_wandering: boolean) {
     sprites.setDataBoolean(sprite_villager, "do_wandering", do_wandering)
     sprites.setDataBoolean(sprite_villager, "slowed_down", false)
     tiles.placeOnRandomTile(sprite_villager, random_path_tile())
+    multilights.addLightSource(sprite_villager, 5)
     return sprite_villager
 }
 function update_serpent (serpent: Sprite) {
@@ -391,6 +400,7 @@ function update_serpent (serpent: Sprite) {
             sprites.setDataBoolean(sprite_fireball, "slowed_down", false)
             sprite_fireball.setPosition(serpent.x, serpent.y)
             spriteutils.setVelocityAtAngle(sprite_fireball, spriteutils.angleFrom(serpent, sprites.readDataSprite(serpent, "target")), 100)
+            multilights.addLightSource(sprite_fireball, 2)
             timer.after(300, function () {
                 character.setCharacterAnimationsEnabled(serpent, true)
             })
@@ -463,6 +473,7 @@ function make_character () {
     status_bar.setColor(3, 10, 13)
     status_bar.setStatusBarFlag(StatusBarFlag.SmoothTransition, true)
     status_bar.attachToSprite(sprite_player)
+    multilights.addLightSource(sprite_player, 10)
     scene.cameraFollowSprite(sprite_player)
 }
 function use_sword () {
@@ -743,6 +754,7 @@ let current_part = ""
 let name = ""
 let sprite_id = 0
 let energy_level = 0
+let dark_mode = false
 let slowing_time = false
 let can_slow_time = false
 let can_fight = false
@@ -754,6 +766,7 @@ can_skip_dialog = false
 can_fight = false
 can_slow_time = false
 slowing_time = false
+dark_mode = false
 energy_level = 100
 sprite_id = 0
 pause(100)
