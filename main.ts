@@ -186,37 +186,34 @@ controller.combos.attachCombo("urdlurdlurdlurdl", function () {
     multilights.toggleLighting(dark_mode)
 })
 function part_1 () {
-    if (true) {
-        if (current_part == "1.1") {
-            make_part_1_tilemap()
-            part_1_1()
-            clear_tilemap()
-            save_part("1.2")
-            pause(1000)
-        }
-        if (current_part == "1.2") {
-            make_part_1_tilemap()
-            part_1_2()
-            clear_tilemap()
-            save_part("1.3")
-            pause(1000)
-        }
-        if (current_part == "1.3") {
-            make_part_1_tilemap()
-            part_1_3()
-            clear_tilemap()
-            save_part("1.4")
-            pause(1000)
-        }
-        if (current_part == "1.4") {
-            save_part("1.4")
-            part_1_4()
-        }
-    } else {
+    if (current_part == "1.1") {
+        make_part_1_tilemap()
+        part_1_1()
+        clear_tilemap()
+        save_part("1.2")
+        pause(1000)
+    }
+    if (current_part == "1.2") {
+        make_part_1_tilemap()
+        part_1_2()
+        clear_tilemap()
+        save_part("1.3")
+        pause(1000)
+    }
+    if (current_part == "1.3") {
         make_part_1_tilemap()
         part_1_3()
         clear_tilemap()
+        save_part("1.4")
+        pause(1000)
     }
+    if (current_part == "1.4") {
+        save_part("1.4")
+        part_1_4()
+    }
+}
+function part_2 () {
+	
 }
 function make_part_1_tilemap () {
     scene.setBackgroundColor(7)
@@ -818,13 +815,25 @@ sprite_player.y += tiles.tileWidth() / 2
 sprite_player.x += tiles.tileWidth() / 2
 timer.background(function () {
     pause(100)
-    part_1()
+    if (false) {
+        part_1()
+    } else {
+        part_2()
+    }
 })
 game.onUpdate(function () {
     for (let kind of [SpriteKind.Player, SpriteKind.Projectile, SpriteKind.Enemy, SpriteKind.Thing, SpriteKind.Villager]) {
         for (let sprite of sprites.allOfKind(kind)) {
             sprite.z = (sprite.bottom - 8) / 100
         }
+    }
+})
+forever(function () {
+    if (info.life() < 20) {
+        pause(randint(1, 20) * 100)
+        info.changeLifeBy(1)
+    } else {
+        pause(100)
     }
 })
 forever(function () {
@@ -846,14 +855,6 @@ forever(function () {
         }
     }
     pause(100)
-})
-forever(function () {
-    if (info.life() < 20) {
-        pause(randint(1, 20) * 100)
-        info.changeLifeBy(1)
-    } else {
-        pause(100)
-    }
 })
 game.onUpdateInterval(200, function () {
     if (slowing_time) {
