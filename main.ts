@@ -182,6 +182,7 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Player, function (sprite, ot
 controller.combos.attachCombo("urdlurdlurdlurdl", function () {
     color.pauseUntilFadeDone()
     dark_mode = !(dark_mode)
+    save_bool("dark_mode", dark_mode)
     multilights.toggleLighting(dark_mode)
 })
 function part_1 () {
@@ -282,6 +283,9 @@ function fade_out (block: boolean) {
     if (block) {
         color.pauseUntilFadeDone()
     }
+}
+function read_bool (name: string) {
+    return blockSettings.readNumber(name) == 1
 }
 function update_serpents_for_x_ms (ms: number) {
     start_time = game.runtime()
@@ -579,6 +583,13 @@ function save_part (part: string) {
         })
     })
 }
+function save_bool (name: string, value: boolean) {
+    if (value) {
+        blockSettings.writeNumber(name, 1)
+    } else {
+        blockSettings.writeNumber(name, 0)
+    }
+}
 function animate_character () {
     character.loopFrames(
     sprite_player,
@@ -766,7 +777,11 @@ can_skip_dialog = false
 can_fight = false
 can_slow_time = false
 slowing_time = false
-dark_mode = false
+if (!(blockSettings.exists("dark_mode"))) {
+    save_bool("dark_mode", false)
+}
+dark_mode = read_bool("dark_mode")
+multilights.toggleLighting(dark_mode)
 energy_level = 100
 sprite_id = 0
 pause(100)
