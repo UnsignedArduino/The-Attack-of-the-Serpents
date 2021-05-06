@@ -110,27 +110,27 @@ function make_serpent (column: number, row: number, health: number) {
     sprite_serpent = sprites.create(assets.animation`serpent_slither_right`[0], SpriteKind.Enemy)
     character.loopFrames(
     sprite_serpent,
-    assets.animation`serpent_slither_right`,
-    100,
-    character.rule(Predicate.MovingRight)
-    )
-    character.loopFrames(
-    sprite_serpent,
     assets.animation`serpent_slither_left`,
     100,
     character.rule(Predicate.MovingLeft)
     )
-    character.runFrames(
+    character.loopFrames(
     sprite_serpent,
-    [assets.animation`serpent_slither_right`[0]],
+    assets.animation`serpent_slither_right`,
     100,
-    character.rule(Predicate.FacingRight)
+    character.rule(Predicate.MovingRight)
     )
     character.runFrames(
     sprite_serpent,
     [assets.animation`serpent_slither_left`[0]],
     100,
     character.rule(Predicate.FacingLeft)
+    )
+    character.runFrames(
+    sprite_serpent,
+    [assets.animation`serpent_slither_right`[0]],
+    100,
+    character.rule(Predicate.FacingRight)
     )
     tiles.placeOnTile(sprite_serpent, tiles.getTileLocation(column, row))
     sprites.setDataSprite(sprite_serpent, "target", sprite_player)
@@ -159,6 +159,14 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         use_sword()
     }
 })
+function update_and_wait_till_x_serpents_left (left: number) {
+    while (sprites.allOfKind(SpriteKind.Enemy).length > left) {
+        for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
+            update_serpent(sprite_serpent)
+        }
+        pause(500)
+    }
+}
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Player, function (sprite, otherSprite) {
     sprite.destroy()
     if (!(sprites.readDataBoolean(otherSprite, "attacking"))) {
@@ -261,6 +269,15 @@ function fade_out (block: boolean) {
     color.startFade(color.Black, color.originalPalette, 2000)
     if (block) {
         color.pauseUntilFadeDone()
+    }
+}
+function update_serpents_for_x_ms (ms: number) {
+    start_time = game.runtime()
+    while (game.runtime() - start_time < ms) {
+        for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
+            update_serpent(sprite_serpent)
+        }
+        pause(500)
     }
 }
 function fade_in (block: boolean) {
@@ -512,7 +529,24 @@ function clear_tilemap () {
 }
 function camera_glide_to (_from: Sprite, to: Sprite, speed: number) {
     if (!(sprite_camera)) {
-        sprite_camera = sprites.create(assets.image`blank`, SpriteKind.Player)
+        sprite_camera = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.Player)
     }
     sprite_camera.setPosition(_from.x, _from.y)
     sprite_camera.setFlag(SpriteFlag.Ghost, true)
@@ -531,14 +565,6 @@ function save_part (part: string) {
             Notification.notify("Your progress has been saved! " + "(To reset, hold down B and press " + "reset.)" + "" + "", 1, assets.image`floppy_disc`)
         })
     })
-}
-function update_and_wait_till_x_snakes_left (left: number) {
-    while (sprites.allOfKind(SpriteKind.Enemy).length > left) {
-        for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
-            update_serpent(sprite_serpent)
-        }
-        pause(500)
-    }
 }
 function animate_character () {
     character.loopFrames(
@@ -608,6 +634,7 @@ function part_1_3 () {
     character.setCharacterState(sprite_player, character.rule(Predicate.FacingDown, Predicate.NotMoving))
     make_serpent(0, 15, 2)
     make_serpent(0, 16, 2)
+    enable_movement(false)
     for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
         sprite_serpent.setFlag(SpriteFlag.GhostThroughWalls, true)
         sprite_serpent.x += tiles.tileWidth() * -1
@@ -633,10 +660,42 @@ function part_1_3 () {
     can_fight = true
     can_slow_time = true
     scene.cameraFollowSprite(sprite_player)
-    update_and_wait_till_x_snakes_left(0)
+    update_and_wait_till_x_serpents_left(0)
+    pause(2000)
+    for (let index = 0; index < 6; index++) {
+        make_serpent(0, 14, 2)
+        make_serpent(0, 17, 2)
+        for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
+            sprite_serpent.setFlag(SpriteFlag.GhostThroughWalls, true)
+            sprite_serpent.x += tiles.tileWidth() * -1
+        }
+        for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
+            timer.background(function () {
+                story.spriteMoveToLocation(sprite_serpent, sprite_serpent.x + (tiles.tileWidth() + 8), sprite_serpent.y, 50)
+            })
+        }
+        update_serpents_for_x_ms(1000)
+        for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
+            sprite_serpent.setFlag(SpriteFlag.GhostThroughWalls, false)
+        }
+        update_serpents_for_x_ms(3000)
+    }
+    update_and_wait_till_x_serpents_left(0)
+    enable_movement(false)
+    pause(1000)
+    timer.background(function () {
+        story.printCharacterText("Wait no come back I see you over there!", name)
+    })
+    scene.followPath(sprite_player, scene.aStar(tiles.locationOfSprite(sprite_player), tiles.getTileLocation(0, 15)), 80)
+    sprite_player.setFlag(SpriteFlag.Ghost, true)
+    while (scene.spritePercentPathCompleted(sprite_player) < 100) {
+        pause(100)
+    }
+    sprite_player.vx = -80
     can_slow_time = false
     slowing_time = false
     can_fight = false
+    scene.cameraFollowSprite(null)
     fade_in(true)
 }
 function random_path_tile () {
@@ -670,6 +729,7 @@ let villager_left_animations: Image[][] = []
 let villager_right_animations: Image[][] = []
 let villager_up_animations: Image[][] = []
 let villager_down_animations: Image[][] = []
+let start_time = 0
 let sprite_thing: Sprite = null
 let status_bar: StatusBarSprite = null
 let sprite_serpent: Sprite = null
