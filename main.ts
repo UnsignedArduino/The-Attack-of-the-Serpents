@@ -213,7 +213,9 @@ function part_1 () {
     }
 }
 function part_2 () {
-	
+    make_part_2_tilemap()
+    fade_out(true)
+    enable_movement(true)
 }
 function make_part_1_tilemap () {
     scene.setBackgroundColor(7)
@@ -649,6 +651,51 @@ function part_1_4 () {
     sprite_end_screen.setFlag(SpriteFlag.Ghost, true)
     fade_out(true)
 }
+function make_part_2_tilemap () {
+    scene.setBackgroundColor(6)
+    tiles.setTilemap(tilemap`level_2`)
+    for (let location of tiles.getTilesByType(sprites.castle.rock0)) {
+        tiles.setWallAt(location, true)
+    }
+    for (let location of tiles.getTilesByType(sprites.castle.rock1)) {
+        tiles.setWallAt(location, true)
+    }
+    for (let location of tiles.getTilesByType(assets.tile`water`)) {
+        tiles.setWallAt(location, true)
+    }
+    for (let location of tiles.getTilesByType(assets.tile`tree_1`)) {
+        place_thing(assets.image`tree_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        sprite_thing.y += -8
+    }
+    for (let location of tiles.getTilesByType(assets.tile`tree_2`)) {
+        place_thing(assets.image`tree_2`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        sprite_thing.y += -8
+    }
+    for (let location of tiles.getTilesByType(assets.tile`tree_3`)) {
+        place_thing(assets.image`tree_3`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        sprite_thing.y += -8
+    }
+    for (let location of tiles.getTilesByType(assets.tile`tree_4`)) {
+        place_thing(assets.image`tree_4`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        sprite_thing.y += -4
+    }
+    for (let location of tiles.getTilesByType(assets.tile`tree_4`)) {
+        place_thing(assets.image`tree_4`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+        sprite_thing.y += -4
+    }
+    for (let location of tiles.getTilesByType(assets.tile`flower_1`)) {
+        place_floor_thing(assets.image`flower_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+    }
+    for (let location of tiles.getTilesByType(assets.tile`flower_2`)) {
+        place_floor_thing(assets.image`flower_2`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+    }
+    for (let location of tiles.getTilesByType(assets.tile`mushroom_1`)) {
+        place_floor_thing(assets.image`mushroom_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+    }
+    for (let location of tiles.getTilesByType(assets.tile`stump_1`)) {
+        place_thing(assets.image`stump_1`, tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row))
+    }
+}
 function part_1_3 () {
     can_fight = true
     tiles.placeOnTile(sprite_player, tiles.getTileLocation(14, 12))
@@ -822,10 +869,13 @@ timer.background(function () {
     }
 })
 game.onUpdate(function () {
-    for (let kind of [SpriteKind.Player, SpriteKind.Projectile, SpriteKind.Enemy, SpriteKind.Thing, SpriteKind.Villager]) {
+    for (let kind of [SpriteKind.Projectile, SpriteKind.Enemy, SpriteKind.Thing, SpriteKind.Villager]) {
         for (let sprite of sprites.allOfKind(kind)) {
-            sprite.z = (sprite.bottom - 8) / 100
+            sprite.z = sprite.bottom / 100
         }
+    }
+    for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
+        sprite.z = (sprite.bottom - 8) / 100
     }
 })
 forever(function () {
