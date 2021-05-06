@@ -660,7 +660,10 @@ function make_part_2_tilemap () {
     for (let location of tiles.getTilesByType(sprites.castle.rock1)) {
         tiles.setWallAt(location, true)
     }
-    for (let location of tiles.getTilesByType(assets.tile`water`)) {
+    for (let location of tiles.getTilesByType(sprites.dungeon.hazardLava0)) {
+        tiles.setWallAt(location, true)
+    }
+    for (let location of tiles.getTilesByType(sprites.dungeon.hazardLava1)) {
         tiles.setWallAt(location, true)
     }
     for (let location of tiles.getTilesByType(assets.tile`tree_1`)) {
