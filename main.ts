@@ -220,6 +220,13 @@ function part_2 () {
         save_part("2.2")
         pause(1000)
     }
+    if (current_part == "2.2") {
+        make_part_2_tilemap()
+        part_2_2()
+        clear_tilemap()
+        save_part("2.3")
+        pause(1000)
+    }
 }
 function make_part_1_tilemap () {
     scene.setBackgroundColor(7)
@@ -513,6 +520,28 @@ function part_1_2 () {
     sprite_leader.destroy()
     character.clearCharacterState(sprite_player)
 }
+function part_2_2 () {
+    tiles.placeOnTile(sprite_player, tiles.getTileLocation(37, 14))
+    sprite_player.y += tiles.tileWidth() / 2
+    sprite_player.setVelocity(0, 0)
+    scene.followPath(sprite_player, scene.aStar(tiles.getTileLocation(0, 0), tiles.getTileLocation(0, 0)), 0)
+    sprite_player.setFlag(SpriteFlag.Ghost, false)
+    scene.cameraFollowSprite(sprite_player)
+    character.setCharacterState(sprite_player, character.rule(Predicate.FacingLeft, Predicate.NotMoving))
+    enable_movement(true)
+    character.clearCharacterState(sprite_player)
+    fade_out(true)
+    can_fight = true
+    can_slow_time = true
+    energy_level = 100
+    while (!(within(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column), 18, 30, true) && within(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row), 5, 24, true))) {
+        pause(100)
+    }
+    enable_movement(false)
+    can_fight = false
+    can_slow_time = false
+    fade_in(true)
+}
 function enable_movement (en: boolean) {
     if (en) {
         controller.moveSprite(sprite_player, 80, 80)
@@ -581,6 +610,13 @@ controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
         story.clearAllText()
     }
 })
+function within (x: number, minimum: number, maximum: number, inclusive: boolean) {
+    if (inclusive) {
+        return x <= maximum && x >= minimum
+    } else {
+        return x < maximum && x > minimum
+    }
+}
 info.onLifeZero(function () {
     timer.throttle("die", 3000, function () {
         timer.background(function () {
