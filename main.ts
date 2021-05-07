@@ -110,29 +110,33 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         }
     }
 })
-function make_serpent (column: number, row: number, health: number) {
+function make_serpent (column: number, row: number, health: number, size: number) {
     sprite_serpent = sprites.create(assets.animation`serpent_slither_right`[0], SpriteKind.Enemy)
+    temp_animation = assets.animation`serpent_slither_left`
     character.loopFrames(
     sprite_serpent,
-    assets.animation`serpent_slither_left`,
+    scale_animation_by(size),
     100,
     character.rule(Predicate.MovingLeft)
     )
+    temp_animation = assets.animation`serpent_slither_right`
     character.loopFrames(
     sprite_serpent,
-    assets.animation`serpent_slither_right`,
+    scale_animation_by(size),
     100,
     character.rule(Predicate.MovingRight)
     )
+    temp_animation = [assets.animation`serpent_slither_left`[0]]
     character.runFrames(
     sprite_serpent,
-    [assets.animation`serpent_slither_left`[0]],
+    scale_animation_by(size),
     100,
     character.rule(Predicate.FacingLeft)
     )
+    temp_animation = [assets.animation`serpent_slither_right`[0]]
     character.runFrames(
     sprite_serpent,
-    [assets.animation`serpent_slither_right`[0]],
+    scale_animation_by(size),
     100,
     character.rule(Predicate.FacingRight)
     )
@@ -142,12 +146,14 @@ function make_serpent (column: number, row: number, health: number) {
     sprite_id += 1
     sprites.setDataBoolean(sprite_serpent, "slowed_down", false)
     multilights.addLightSource(sprite_serpent, 5)
-    status_bar = statusbars.create(16, 2, StatusBarKind.EnemyHealth)
+    status_bar = statusbars.create(16 * size, 2 * size, StatusBarKind.EnemyHealth)
     status_bar.setColor(2, 0, 3)
     status_bar.setStatusBarFlag(StatusBarFlag.SmoothTransition, true)
     status_bar.attachToSprite(sprite_serpent)
     status_bar.value = health
     status_bar.max = health
+    status_bar.setOffsetPadding(0, 1 * size)
+    status_bar.positionDirection(CollisionDirection.Top)
     status_bar.setFlag(SpriteFlag.Ghost, true)
     return sprite_serpent
 }
@@ -404,15 +410,15 @@ function part_2_1 () {
     can_fight = true
     can_slow_time = true
     energy_level = 100
-    make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row), 4)
+    make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row), 4, 1)
     update_and_wait_till_x_serpents_left(0)
     pause(1000)
-    make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) - 1, 0, tiles.tilemapRows() - 1), 4)
-    make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) + 1, 0, tiles.tilemapRows() - 1), 4)
+    make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) - 1, 0, tiles.tilemapRows() - 1), 4, 1)
+    make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) + 1, 0, tiles.tilemapRows() - 1), 4, 1)
     update_and_wait_till_x_serpents_left(0)
     while (tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) > 50) {
-        make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) - 1, 0, tiles.tilemapRows() - 1), 4)
-        make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) + 1, 0, tiles.tilemapRows() - 1), 4)
+        make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) - 1, 0, tiles.tilemapRows() - 1), 4, 1)
+        make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) + 1, 0, tiles.tilemapRows() - 1), 4, 1)
         update_and_wait_till_x_serpents_left(0)
     }
     enable_movement(false)
@@ -546,7 +552,7 @@ function part_2_2 () {
     tiles.getTileLocation(10, 10),
     tiles.getTileLocation(10, 19)
     ]) {
-        make_serpent(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row), 6)
+        make_serpent(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row), 6, 1)
     }
     enable_movement(true)
     character.clearCharacterState(sprite_player)
@@ -700,6 +706,21 @@ function save_bool (name: string, value: boolean) {
         blockSettings.writeNumber(name, 0)
     }
 }
+function scale_animation_by (size: number) {
+    temp_array = []
+    for (let frame of temp_animation) {
+        if (size == 0.5) {
+            temp_array.push(scaling.scaleHalfX(frame))
+        } else if (size == 2) {
+            temp_array.push(scaling.scale2x(frame))
+        } else if (size == 3) {
+            temp_array.push(scaling.scale3x(frame))
+        } else {
+            temp_array.push(frame.clone())
+        }
+    }
+    return temp_array
+}
 function animate_character () {
     character.loopFrames(
     sprite_player,
@@ -771,6 +792,8 @@ function part_2_3 () {
     scene.cameraFollowSprite(sprite_player)
     character.setCharacterState(sprite_player, character.rule(Predicate.FacingRight, Predicate.NotMoving))
     character.clearCharacterState(sprite_player)
+    sprite_boss = make_serpent(28, 14, 50, 3)
+    sprite_boss.y += tiles.tileWidth() / 2
     fade_out(true)
     pause(1000)
     for (let index = 0; index <= 5; index++) {
@@ -843,8 +866,8 @@ function part_1_3 () {
     can_fight = true
     tiles.placeOnTile(sprite_player, tiles.getTileLocation(14, 12))
     character.setCharacterState(sprite_player, character.rule(Predicate.FacingDown, Predicate.NotMoving))
-    make_serpent(0, 15, 2)
-    make_serpent(0, 16, 2)
+    make_serpent(0, 15, 2, 1)
+    make_serpent(0, 16, 2, 1)
     enable_movement(false)
     for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
         sprite_serpent.setFlag(SpriteFlag.GhostThroughWalls, true)
@@ -874,8 +897,8 @@ function part_1_3 () {
     update_and_wait_till_x_serpents_left(0)
     pause(2000)
     for (let index = 0; index < 6; index++) {
-        make_serpent(0, 14, 2)
-        make_serpent(0, 17, 2)
+        make_serpent(0, 14, 2, 1)
+        make_serpent(0, 17, 2, 1)
         for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
             sprite_serpent.setFlag(SpriteFlag.GhostThroughWalls, true)
             sprite_serpent.x += tiles.tileWidth() * -1
@@ -932,7 +955,9 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         }
     })
 })
+let sprite_boss: Sprite = null
 let sprite_end_screen: Sprite = null
+let temp_array: Image[] = []
 let sprite_camera: Sprite = null
 let sprite_fireball: Sprite = null
 let sprite_villager: Sprite = null
@@ -943,6 +968,7 @@ let villager_down_animations: Image[][] = []
 let start_time = 0
 let sprite_thing: Sprite = null
 let status_bar: StatusBarSprite = null
+let temp_animation: Image[] = []
 let sprite_serpent: Sprite = null
 let path: tiles.Location[] = []
 let sprite_leader: Sprite = null

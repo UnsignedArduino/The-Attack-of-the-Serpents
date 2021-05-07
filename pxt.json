@@ -16,7 +16,8 @@
         "Notifications": "github:unsignedarduino/notifications#21017061b0935e0abbaa3426f459d5cd79670b4d",
         "pxt-status-bar": "github:jwunderl/pxt-status-bar#v0.4.1",
         "pxt-lantern": "github:felixtsu/pxt-lantern#v0.2.0",
-        "pxt-button-combos": "github:jwunderl/pxt-button-combos#v0.0.24"
+        "pxt-button-combos": "github:jwunderl/pxt-button-combos#v0.0.24",
+        "pxt-scaling": "github:jwunderl/pxt-scaling#v0.1.0"
     },
     "files": [
         "main.blocks",
