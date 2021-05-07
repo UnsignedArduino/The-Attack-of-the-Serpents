@@ -920,14 +920,6 @@ game.onUpdate(function () {
     }
 })
 forever(function () {
-    if (info.life() < 20) {
-        pause(randint(1, 20) * 100)
-        info.changeLifeBy(1)
-    } else {
-        pause(100)
-    }
-})
-forever(function () {
     for (let kind of [SpriteKind.Enemy, SpriteKind.Projectile, SpriteKind.Villager]) {
         for (let sprite of sprites.allOfKind(kind)) {
             if (sprites.readDataBoolean(sprite, "slowed_down")) {
@@ -946,6 +938,13 @@ forever(function () {
         }
     }
     pause(100)
+})
+game.onUpdateInterval(100, function () {
+    if (info.life() < 20 && info.life() > 0) {
+        if (Math.percentChance(5)) {
+            info.changeLifeBy(1)
+        }
+    }
 })
 game.onUpdateInterval(200, function () {
     if (slowing_time) {
