@@ -528,16 +528,26 @@ function part_2_2 () {
     sprite_player.setFlag(SpriteFlag.Ghost, false)
     scene.cameraFollowSprite(sprite_player)
     character.setCharacterState(sprite_player, character.rule(Predicate.FacingLeft, Predicate.NotMoving))
+    for (let location of [
+    tiles.getTileLocation(36, 10),
+    tiles.getTileLocation(36, 19),
+    tiles.getTileLocation(2, 2),
+    tiles.getTileLocation(2, 27),
+    tiles.getTileLocation(10, 10),
+    tiles.getTileLocation(10, 19)
+    ]) {
+        make_serpent(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row), 2)
+    }
     enable_movement(true)
     character.clearCharacterState(sprite_player)
     fade_out(true)
     can_fight = true
     can_slow_time = true
     energy_level = 100
-    while (!(within(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column), 18, 30, true) && within(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row), 5, 24, true))) {
-        update_serpents_for_x_ms(550)
-    }
     update_and_wait_till_x_serpents_left(0)
+    while (!(within(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column), 18, 30, true) && within(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row), 5, 24, true))) {
+        pause(100)
+    }
     enable_movement(false)
     can_fight = false
     can_slow_time = false
