@@ -227,6 +227,13 @@ function part_2 () {
         save_part("2.3")
         pause(1000)
     }
+    if (current_part == "2.3") {
+        make_part_2_tilemap()
+        part_2_3()
+        clear_tilemap()
+        save_part("2.4")
+        pause(1000)
+    }
 }
 function make_part_1_tilemap () {
     scene.setBackgroundColor(7)
@@ -755,6 +762,28 @@ function part_1_4 () {
     sprite_end_screen.setFlag(SpriteFlag.Ghost, true)
     fade_out(true)
 }
+function part_2_3 () {
+    tiles.placeOnTile(sprite_player, tiles.getTileLocation(19, 14))
+    sprite_player.y += tiles.tileWidth() / 2
+    sprite_player.setVelocity(0, 0)
+    scene.followPath(sprite_player, scene.aStar(tiles.getTileLocation(0, 0), tiles.getTileLocation(0, 0)), 0)
+    sprite_player.setFlag(SpriteFlag.Ghost, false)
+    scene.cameraFollowSprite(sprite_player)
+    character.setCharacterState(sprite_player, character.rule(Predicate.FacingRight, Predicate.NotMoving))
+    enable_movement(true)
+    character.clearCharacterState(sprite_player)
+    fade_out(true)
+    can_fight = true
+    can_slow_time = true
+    energy_level = 100
+    while (true) {
+        pause(100)
+    }
+    enable_movement(false)
+    can_fight = false
+    can_slow_time = false
+    fade_in(true)
+}
 function make_part_2_tilemap () {
     scene.setBackgroundColor(6)
     tiles.setTilemap(tilemap`level_2`)
@@ -970,7 +999,7 @@ sprite_player.x += tiles.tileWidth() / 2
 timer.background(function () {
     pause(100)
     if (true) {
-        save_part("2.2")
+        save_part("2.3")
     }
     if (current_part.charAt(0) == "1") {
         part_1()
