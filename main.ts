@@ -214,8 +214,9 @@ function part_1 () {
 }
 function part_2 () {
     make_part_2_tilemap()
-    fade_out(true)
-    enable_movement(true)
+    part_2_1()
+    clear_tilemap()
+    save_part("2.1")
 }
 function make_part_1_tilemap () {
     scene.setBackgroundColor(7)
@@ -370,6 +371,19 @@ function make_villager (picture_index: number, do_wandering: boolean) {
     tiles.placeOnRandomTile(sprite_villager, random_path_tile())
     multilights.addLightSource(sprite_villager, 5)
     return sprite_villager
+}
+function part_2_1 () {
+    tiles.placeOnTile(sprite_player, tiles.getTileLocation(79, 14))
+    character.setCharacterState(sprite_player, character.rule(Predicate.FacingLeft, Predicate.NotMoving))
+    fade_out(true)
+    story.printCharacterText("Oh no where did they go?", name)
+    story.printCharacterText("Ah ha I see you over there!", name)
+    enable_movement(true)
+    character.clearCharacterState(sprite_player)
+    while (true) {
+        pause(100)
+    }
+    fade_out(true)
 }
 function update_serpent (serpent: Sprite) {
     if (!(spriteutils.isDestroyed(sprites.readDataSprite(serpent, "target")))) {
