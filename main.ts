@@ -380,18 +380,42 @@ function part_2_1 () {
     story.printCharacterText("Ah ha I see you over there!", name)
     enable_movement(true)
     character.clearCharacterState(sprite_player)
-    while (true) {
-        pause(100)
+    can_fight = true
+    can_slow_time = true
+    energy_level = 100
+    make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row), 4)
+    update_and_wait_till_x_serpents_left(0)
+    pause(1000)
+    make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) - 1, 0, tiles.tilemapRows() - 1), 4)
+    make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) + 1, 0, tiles.tilemapRows() - 1), 4)
+    update_and_wait_till_x_serpents_left(0)
+    for (let index = 0; index <= 4; index++) {
+        make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) - (index - 2), 0, tiles.tilemapRows() - 1), 4)
     }
-    fade_out(true)
+    update_and_wait_till_x_serpents_left(0)
+    fade_in(true)
+    can_fight = false
+    can_slow_time = false
 }
 function update_serpent (serpent: Sprite) {
     if (!(spriteutils.isDestroyed(sprites.readDataSprite(serpent, "target")))) {
         path = scene.aStar(tiles.locationOfSprite(serpent), tiles.locationOfSprite(sprites.readDataSprite(serpent, "target")))
-        if (slowing_time) {
-            scene.followPath(serpent, path, 10)
+        if (path) {
+            if (slowing_time) {
+                scene.followPath(serpent, path, 10)
+            } else {
+                scene.followPath(serpent, path, 50)
+            }
         } else {
-            scene.followPath(serpent, path, 50)
+            serpent.setFlag(SpriteFlag.GhostThroughWalls, true)
+            while (tiles.tileIsWall(tiles.locationOfSprite(serpent))) {
+                if (slowing_time) {
+                    spriteutils.setVelocityAtAngle(serpent, spriteutils.angleFrom(serpent, sprites.readDataSprite(serpent, "target")), 10)
+                } else {
+                    spriteutils.setVelocityAtAngle(serpent, spriteutils.angleFrom(serpent, sprites.readDataSprite(serpent, "target")), 50)
+                }
+            }
+            serpent.setFlag(SpriteFlag.GhostThroughWalls, false)
         }
         if (spriteutils.distanceBetween(serpent, sprites.readDataSprite(serpent, "target")) < 48) {
             if (character.matchesRule(serpent, character.rule(Predicate.FacingLeft))) {
