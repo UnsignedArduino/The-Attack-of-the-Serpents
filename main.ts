@@ -204,7 +204,7 @@ function part_1 () {
         make_part_1_tilemap()
         part_1_3()
         clear_tilemap()
-        save_part("1.4")
+        save_part("2.1")
         pause(1000)
     }
     if (current_part == "1.4") {
@@ -213,10 +213,13 @@ function part_1 () {
     }
 }
 function part_2 () {
-    make_part_2_tilemap()
-    part_2_1()
-    clear_tilemap()
-    save_part("2.1")
+    if (current_part == "2.1") {
+        make_part_2_tilemap()
+        part_2_1()
+        clear_tilemap()
+        save_part("2.2")
+        pause(1000)
+    }
 }
 function make_part_1_tilemap () {
     scene.setBackgroundColor(7)
@@ -374,6 +377,10 @@ function make_villager (picture_index: number, do_wandering: boolean) {
 }
 function part_2_1 () {
     tiles.placeOnTile(sprite_player, tiles.getTileLocation(79, 14))
+    sprite_player.setVelocity(0, 0)
+    scene.followPath(sprite_player, scene.aStar(tiles.getTileLocation(0, 0), tiles.getTileLocation(0, 0)), 0)
+    sprite_player.setFlag(SpriteFlag.Ghost, false)
+    scene.cameraFollowSprite(sprite_player)
     character.setCharacterState(sprite_player, character.rule(Predicate.FacingLeft, Predicate.NotMoving))
     fade_out(true)
     story.printCharacterText("Oh no where did they go?", name)
@@ -389,13 +396,19 @@ function part_2_1 () {
     make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) - 1, 0, tiles.tilemapRows() - 1), 4)
     make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) + 1, 0, tiles.tilemapRows() - 1), 4)
     update_and_wait_till_x_serpents_left(0)
-    for (let index = 0; index <= 4; index++) {
-        make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) - (index - 2), 0, tiles.tilemapRows() - 1), 4)
+    while (tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) > 50) {
+        make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) - 1, 0, tiles.tilemapRows() - 1), 4)
+        make_serpent(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column) - (scene.screenWidth() / tiles.tileWidth() + 2), Math.constrain(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row) + 1, 0, tiles.tilemapRows() - 1), 4)
+        update_and_wait_till_x_serpents_left(0)
     }
-    update_and_wait_till_x_serpents_left(0)
-    fade_in(true)
+    enable_movement(false)
     can_fight = false
     can_slow_time = false
+    character.setCharacterState(sprite_player, character.rule(Predicate.FacingLeft, Predicate.NotMoving))
+    story.printCharacterText("Wow, this place is HUGE!", name)
+    character.clearCharacterState(sprite_player)
+    scene.followPath(sprite_player, scene.aStar(tiles.locationOfSprite(sprite_player), tiles.getTileLocation(17, 14)), 50)
+    fade_in(true)
 }
 function update_serpent (serpent: Sprite) {
     if (!(spriteutils.isDestroyed(sprites.readDataSprite(serpent, "target")))) {
@@ -414,6 +427,7 @@ function update_serpent (serpent: Sprite) {
                 } else {
                     spriteutils.setVelocityAtAngle(serpent, spriteutils.angleFrom(serpent, sprites.readDataSprite(serpent, "target")), 50)
                 }
+                pause(100)
             }
             serpent.setFlag(SpriteFlag.GhostThroughWalls, false)
         }
@@ -480,10 +494,12 @@ function part_1_2 () {
         Notification.waitForNotificationFinish()
         Notification.notify("Drums play in the distance", 1, assets.image`closed_captioning_icon`)
     })
+    music.setVolume(50)
     for (let index = 0; index < 24; index++) {
         music.thump.playUntilDone()
         music.rest(music.beat(BeatFraction.Half))
     }
+    music.setVolume(20)
     story.printCharacterText("Oh no today is the day. They are attacking. Go fend them off. I assume you know how to use a sword? ", "Village Leader")
     story.printCharacterText("No not reall-", name)
     story.printCharacterText("Then I will see you later. Good luck and hold them off until I get everyone to safety.", "Village Leader")
@@ -903,11 +919,10 @@ sprite_player.y += tiles.tileWidth() / 2
 sprite_player.x += tiles.tileWidth() / 2
 timer.background(function () {
     pause(100)
-    if (false) {
+    if (current_part.charAt(0) == "1") {
         part_1()
-    } else {
-        part_2()
     }
+    part_2()
 })
 game.onUpdate(function () {
     for (let kind of [SpriteKind.Projectile, SpriteKind.Enemy, SpriteKind.Thing, SpriteKind.Villager]) {
