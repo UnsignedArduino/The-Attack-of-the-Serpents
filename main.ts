@@ -419,6 +419,9 @@ function part_2_1 () {
 }
 function update_serpent (serpent: Sprite) {
     if (!(spriteutils.isDestroyed(sprites.readDataSprite(serpent, "target")))) {
+        if (spriteutils.distanceBetween(serpent, sprites.readDataSprite(serpent, "target")) > 8 * tiles.tileWidth()) {
+            return
+        }
         path = scene.aStar(tiles.locationOfSprite(serpent), tiles.locationOfSprite(sprites.readDataSprite(serpent, "target")))
         if (path) {
             if (slowing_time) {
@@ -536,7 +539,7 @@ function part_2_2 () {
     tiles.getTileLocation(10, 10),
     tiles.getTileLocation(10, 19)
     ]) {
-        make_serpent(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row), 2)
+        make_serpent(tiles.locationXY(location, tiles.XY.column), tiles.locationXY(location, tiles.XY.row), 6)
     }
     enable_movement(true)
     character.clearCharacterState(sprite_player)
