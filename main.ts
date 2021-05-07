@@ -770,9 +770,16 @@ function part_2_3 () {
     sprite_player.setFlag(SpriteFlag.Ghost, false)
     scene.cameraFollowSprite(sprite_player)
     character.setCharacterState(sprite_player, character.rule(Predicate.FacingRight, Predicate.NotMoving))
-    enable_movement(true)
     character.clearCharacterState(sprite_player)
     fade_out(true)
+    pause(1000)
+    for (let index = 0; index <= 5; index++) {
+        tiles.setTileAt(tiles.getTileLocation(17, 12 + index), sprites.dungeon.greenOuterWest0)
+        tiles.setWallAt(tiles.getTileLocation(17, 12 + index), true)
+        pause(500)
+    }
+    pause(1000)
+    enable_movement(true)
     can_fight = true
     can_slow_time = true
     energy_level = 100
