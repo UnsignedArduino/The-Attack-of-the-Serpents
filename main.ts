@@ -535,8 +535,9 @@ function part_2_2 () {
     can_slow_time = true
     energy_level = 100
     while (!(within(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.column), 18, 30, true) && within(tiles.locationXY(tiles.locationOfSprite(sprite_player), tiles.XY.row), 5, 24, true))) {
-        pause(100)
+        update_serpents_for_x_ms(550)
     }
+    update_and_wait_till_x_serpents_left(0)
     enable_movement(false)
     can_fight = false
     can_slow_time = false
@@ -955,6 +956,9 @@ sprite_player.y += tiles.tileWidth() / 2
 sprite_player.x += tiles.tileWidth() / 2
 timer.background(function () {
     pause(100)
+    if (true) {
+        save_part("2.2")
+    }
     if (current_part.charAt(0) == "1") {
         part_1()
     }
