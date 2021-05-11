@@ -628,7 +628,6 @@ function use_sword () {
 }
 function shoot_fireball (_from: Sprite, to: Sprite) {
     sprite_fireball = sprites.create(assets.image`fireball`, SpriteKind.Projectile)
-    sprite_fireball.setFlag(SpriteFlag.AutoDestroy, true)
     sprite_fireball.setFlag(SpriteFlag.DestroyOnWall, true)
     sprites.setDataBoolean(sprite_fireball, "slowed_down", false)
     sprite_fireball.setPosition(_from.x, _from.y)
