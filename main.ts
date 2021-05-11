@@ -237,6 +237,9 @@ function part_2 () {
         save_part("2.4")
         pause(1000)
     }
+    if (current_part == "2.4") {
+        part_2_4()
+    }
 }
 function make_part_1_tilemap () {
     scene.setBackgroundColor(7)
@@ -735,6 +738,18 @@ function save_bool (name: string, value: boolean) {
         blockSettings.writeNumber(name, 0)
     }
 }
+function part_2_4 () {
+    enable_movement(false)
+    can_fight = false
+    can_slow_time = false
+    sprite_end_screen = sprites.create(assets.image`part_2_end`, SpriteKind.Title)
+    sprite_end_screen.top = 0
+    sprite_end_screen.left = 0
+    sprite_end_screen.z = 100
+    sprite_end_screen.setFlag(SpriteFlag.RelativeToCamera, true)
+    sprite_end_screen.setFlag(SpriteFlag.Ghost, true)
+    fade_out(true)
+}
 function scale_animation_by (size: number) {
     temp_array = []
     for (let frame of temp_animation) {
@@ -805,18 +820,6 @@ function animate_character () {
     100,
     character.rule(Predicate.NotMoving, Predicate.FacingLeft)
     )
-}
-function part_1_4 () {
-    enable_movement(false)
-    can_fight = false
-    can_slow_time = false
-    sprite_end_screen = sprites.create(assets.image`part_1_end`, SpriteKind.Title)
-    sprite_end_screen.top = 0
-    sprite_end_screen.left = 0
-    sprite_end_screen.z = 100
-    sprite_end_screen.setFlag(SpriteFlag.RelativeToCamera, true)
-    sprite_end_screen.setFlag(SpriteFlag.Ghost, true)
-    fade_out(true)
 }
 function part_2_3 () {
     tiles.placeOnTile(sprite_player, tiles.getTileLocation(19, 14))
@@ -1059,8 +1062,8 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
 })
 let sprite_darkness: Sprite = null
 let sprite_boss: Sprite = null
-let sprite_end_screen: Sprite = null
 let temp_array: Image[] = []
+let sprite_end_screen: Sprite = null
 let sprite_camera: Sprite = null
 let sprite_fireball: Sprite = null
 let sprite_villager: Sprite = null
