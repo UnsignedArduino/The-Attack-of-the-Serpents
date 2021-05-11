@@ -214,10 +214,6 @@ function part_1 () {
         save_part("2.1")
         pause(1000)
     }
-    if (current_part == "1.4") {
-        save_part("1.4")
-        part_1_4()
-    }
 }
 function part_2 () {
     if (current_part == "2.1") {
@@ -1138,9 +1134,6 @@ sprite_player.y += tiles.tileWidth() / 2
 sprite_player.x += tiles.tileWidth() / 2
 timer.background(function () {
     pause(100)
-    if (true) {
-        save_part("2.3")
-    }
     if (current_part.charAt(0) == "1") {
         part_1()
     }
