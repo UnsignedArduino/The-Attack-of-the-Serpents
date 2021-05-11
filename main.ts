@@ -472,13 +472,7 @@ function update_serpent (serpent: Sprite) {
                 false
                 )
             }
-            sprite_fireball = sprites.create(assets.image`fireball`, SpriteKind.Projectile)
-            sprite_fireball.setFlag(SpriteFlag.AutoDestroy, true)
-            sprite_fireball.setFlag(SpriteFlag.DestroyOnWall, true)
-            sprites.setDataBoolean(sprite_fireball, "slowed_down", false)
-            sprite_fireball.setPosition(serpent.x, serpent.y)
-            spriteutils.setVelocityAtAngle(sprite_fireball, spriteutils.angleFrom(serpent, sprites.readDataSprite(serpent, "target")), 100)
-            multilights.addLightSource(sprite_fireball, 2)
+            shoot_fireball(serpent, sprites.readDataSprite(serpent, "target"))
             timer.after(300, function () {
                 character.setCharacterAnimationsEnabled(serpent, true)
             })
@@ -631,6 +625,15 @@ function use_sword () {
             character.setCharacterAnimationsEnabled(sprite_player, true)
         })
     })
+}
+function shoot_fireball (_from: Sprite, to: Sprite) {
+    sprite_fireball = sprites.create(assets.image`fireball`, SpriteKind.Projectile)
+    sprite_fireball.setFlag(SpriteFlag.AutoDestroy, true)
+    sprite_fireball.setFlag(SpriteFlag.DestroyOnWall, true)
+    sprites.setDataBoolean(sprite_fireball, "slowed_down", false)
+    sprite_fireball.setPosition(_from.x, _from.y)
+    spriteutils.setVelocityAtAngle(sprite_fireball, spriteutils.angleFrom(_from, to), 100)
+    multilights.addLightSource(sprite_fireball, 2)
 }
 controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
     if (can_skip_dialog) {
