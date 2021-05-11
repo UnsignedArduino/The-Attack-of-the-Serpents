@@ -742,13 +742,23 @@ function part_2_4 () {
     enable_movement(false)
     can_fight = false
     can_slow_time = false
-    sprite_end_screen = sprites.create(assets.image`part_2_end`, SpriteKind.Title)
+    sprite_end_screen = sprites.create(assets.image`part_2_end_1`, SpriteKind.Title)
     sprite_end_screen.top = 0
     sprite_end_screen.left = 0
     sprite_end_screen.z = 100
     sprite_end_screen.setFlag(SpriteFlag.RelativeToCamera, true)
     sprite_end_screen.setFlag(SpriteFlag.Ghost, true)
     fade_out(true)
+    while (true) {
+        for (let image2 of [assets.image`part_2_end_2`, assets.image`part_2_end_3`, assets.image`part_2_end_1`]) {
+            pause(5000)
+            if (Math.percentChance(3)) {
+                imagemorph.morph(sprite_end_screen, assets.image`part_2_end_easter_egg`)
+                pause(5000)
+            }
+            imagemorph.morph(sprite_end_screen, image2)
+        }
+    }
 }
 function scale_animation_by (size: number) {
     temp_array = []

@@ -17,7 +17,8 @@
         "pxt-status-bar": "github:jwunderl/pxt-status-bar#v0.4.1",
         "pxt-lantern": "github:felixtsu/pxt-lantern#v0.2.0",
         "pxt-button-combos": "github:jwunderl/pxt-button-combos#v0.0.24",
-        "pxt-scaling": "github:jwunderl/pxt-scaling#v0.1.0"
+        "pxt-scaling": "github:jwunderl/pxt-scaling#v0.1.0",
+        "pxt-image-morph": "github:UnicycleDumpTruck/pxt-image-morph#v0.5.0"
     },
     "files": [
         "main.blocks",
