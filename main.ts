@@ -986,7 +986,7 @@ function part_1_3 () {
     enable_movement(false)
     for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
         sprite_serpent.setFlag(SpriteFlag.GhostThroughWalls, true)
-        sprite_serpent.x += tiles.tileWidth() * -1
+        sprite_serpent.x += tiles.tileWidth() * -1.5
     }
     info.setLife(20)
     fade_out(true)
@@ -997,7 +997,7 @@ function part_1_3 () {
     pause(1000)
     for (let sprite_serpent of sprites.allOfKind(SpriteKind.Enemy)) {
         timer.background(function () {
-            story.spriteMoveToLocation(sprite_serpent, sprite_serpent.x + (tiles.tileWidth() + 8), sprite_serpent.y, 50)
+            story.spriteMoveToLocation(sprite_serpent, sprite_serpent.x + tiles.tileWidth() * 2, sprite_serpent.y, 50)
         })
     }
     pause(1000)
@@ -1046,6 +1046,7 @@ function part_1_3 () {
     can_fight = false
     scene.cameraFollowSprite(null)
     fade_in(true)
+    story.clearAllText()
 }
 function random_path_tile () {
     return [
