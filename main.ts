@@ -823,6 +823,19 @@ function part_2_3 () {
     story.printCharacterText("Anyways let me just quickly throw some fireballs - you are in my way and I have a meeting with my advisors-", "The Snake Emperor")
     story.printCharacterText("They are all dead!", "*Voice in the distance*")
     story.printCharacterText("Dang, you are a pesky little hero. Stand still!", "The Snake Emperor")
+    story.spriteMoveToLocation(sprite_boss, sprite_player.x + 6 * tiles.tileWidth(), sprite_player.y, 50)
+    story.spriteMoveToLocation(sprite_boss, sprite_player.x + 5 * tiles.tileWidth(), sprite_player.y, 50)
+    for (let index = 0; index < 3; index++) {
+        shoot_fireball(sprite_boss, sprite_player)
+        pause(100)
+        slowing_time = true
+    }
+    story.spriteMoveToLocation(sprite_player, sprite_player.x, sprite_player.y + 2 * tiles.tileWidth(), 50)
+    slowing_time = false
+    pause(1000)
+    story.printCharacterText("Oh, so you are gonna play that game huh?", "The Snake Emperor")
+    story.printCharacterText("ALRIGHT THEN FIGHT ME! DON'T BE A COWARD!", name)
+    story.printCharacterText("ALRIGHT NOW I'M AAANNNGGGRRRYYY!!!", "The Snake Emperor")
     enable_movement(true)
     can_fight = true
     can_slow_time = true
