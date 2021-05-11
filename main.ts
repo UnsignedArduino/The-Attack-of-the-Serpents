@@ -848,6 +848,15 @@ function part_2_3 () {
     energy_level = 100
     character.setCharacterState(sprite_boss, character.rule(Predicate.FacingLeft, Predicate.NotMoving))
     story.spriteMoveToLocation(sprite_boss, sprite_boss.x, sprite_boss.y + -5 * tiles.tileWidth(), 50)
+    timer.background(function () {
+        while (!(spriteutils.isDestroyed(sprite_boss))) {
+            for (let index = 0; index < 3; index++) {
+                shoot_fireball(sprite_boss, sprite_player)
+                pause(100)
+            }
+            pause(1000)
+        }
+    })
     while (!(spriteutils.isDestroyed(sprite_boss))) {
         for (let diff of [5, 5, -5, -5]) {
             pause(1000)
