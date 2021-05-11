@@ -543,6 +543,17 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 . . . . . . . . . . . . . . . . 
 . . . . . . . . . . . . . . . . 
 `;
+            case "Gd_#P07KCSvY$8?,1#-i":
+            case "darkness_image":return img`
+3 3 3 3 3 3 3 3 
+3 3 3 3 3 3 3 3 
+3 3 3 3 3 3 3 3 
+3 3 3 3 3 3 3 3 
+3 3 3 3 3 3 3 3 
+3 3 3 3 3 3 3 3 
+3 3 3 3 3 3 3 3 
+3 3 3 3 3 3 3 3 
+`;
         }
         return null;
     })

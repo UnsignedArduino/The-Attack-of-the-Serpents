@@ -2,6 +2,7 @@ namespace SpriteKind {
     export const Thing = SpriteKind.create()
     export const Villager = SpriteKind.create()
     export const Title = SpriteKind.create()
+    export const Darkness = SpriteKind.create()
 }
 function house_walls_around (column: number, row: number) {
     tiles.setWallAt(tiles.getTileLocation(column - 1, row - 1), true)
@@ -301,6 +302,12 @@ function make_part_1_tilemap () {
     }
     sprites.setDataBoolean(sprite_thing, "has_leader", true)
 }
+scene.onOverlapTile(SpriteKind.Darkness, sprites.dungeon.floorLight1, function (sprite, location) {
+    tiles.setTileAt(location, assets.tile`darkness`)
+    timer.after(2000, function () {
+        tiles.setTileAt(location, sprites.dungeon.floorLight1)
+    })
+})
 function fade_out (block: boolean) {
     color.startFade(color.Black, color.originalPalette, 2000)
     if (block) {
@@ -563,6 +570,12 @@ function part_2_2 () {
     can_slow_time = false
     fade_in(true)
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`darkness`, function (sprite, location) {
+    timer.throttle("damage_from_darkness", 250, function () {
+        scene.cameraShake(4, 250)
+        info.changeLifeBy(-1)
+    })
+})
 function enable_movement (en: boolean) {
     if (en) {
         controller.moveSprite(sprite_player, 80, 80)
@@ -583,6 +596,18 @@ function make_character () {
     multilights.addLightSource(sprite_player, 10)
     scene.cameraFollowSprite(sprite_player)
 }
+scene.onOverlapTile(SpriteKind.Darkness, sprites.dungeon.floorLight0, function (sprite, location) {
+    tiles.setTileAt(location, assets.tile`darkness`)
+    timer.after(2000, function () {
+        tiles.setTileAt(location, sprites.dungeon.floorLight0)
+    })
+})
+scene.onOverlapTile(SpriteKind.Darkness, sprites.dungeon.floorLightMoss, function (sprite, location) {
+    tiles.setTileAt(location, assets.tile`darkness`)
+    timer.after(2000, function () {
+        tiles.setTileAt(location, sprites.dungeon.floorLightMoss)
+    })
+})
 function use_sword () {
     timer.throttle("attack", 400, function () {
         sprites.setDataBoolean(sprite_player, "attacking", true)
@@ -634,6 +659,12 @@ function shoot_fireball (_from: Sprite, to: Sprite) {
     spriteutils.setVelocityAtAngle(sprite_fireball, spriteutils.angleFrom(_from, to), 100)
     multilights.addLightSource(sprite_fireball, 2)
 }
+scene.onOverlapTile(SpriteKind.Darkness, sprites.dungeon.floorLight4, function (sprite, location) {
+    tiles.setTileAt(location, assets.tile`darkness`)
+    timer.after(2000, function () {
+        tiles.setTileAt(location, sprites.dungeon.floorLight4)
+    })
+})
 controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
     if (can_skip_dialog) {
         story.clearAllText()
@@ -723,6 +754,12 @@ function scale_animation_by (size: number) {
     }
     return temp_array
 }
+scene.onOverlapTile(SpriteKind.Darkness, sprites.dungeon.floorLight3, function (sprite, location) {
+    tiles.setTileAt(location, assets.tile`darkness`)
+    timer.after(2000, function () {
+        tiles.setTileAt(location, sprites.dungeon.floorLightMoss)
+    })
+})
 function animate_character () {
     character.loopFrames(
     sprite_player,
@@ -853,7 +890,15 @@ function part_2_3 () {
                 shoot_fireball(sprite_boss, sprite_player)
                 pause(100)
             }
-            pause(1000)
+            if (Math.percentChance(20)) {
+                sprite_darkness = sprites.create(assets.image`darkness_image`, SpriteKind.Darkness)
+                sprite_darkness.setPosition(sprite_boss.x, sprite_boss.y)
+                sprite_darkness.setFlag(SpriteFlag.DestroyOnWall, true)
+                sprite_darkness.setFlag(SpriteFlag.Invisible, true)
+                sprite_darkness.lifespan = 3000
+                spriteutils.setVelocityAtAngle(sprite_darkness, spriteutils.angleFrom(sprite_darkness, sprite_player), 40)
+            }
+            pause(2000)
         }
     })
     while (!(spriteutils.isDestroyed(sprite_boss))) {
@@ -1016,6 +1061,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         }
     })
 })
+let sprite_darkness: Sprite = null
 let sprite_boss: Sprite = null
 let sprite_end_screen: Sprite = null
 let temp_array: Image[] = []
