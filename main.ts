@@ -146,7 +146,7 @@ function make_serpent (column: number, row: number, health: number, size: number
     sprites.setDataNumber(sprite_serpent, "id", sprite_id)
     sprite_id += 1
     sprites.setDataBoolean(sprite_serpent, "slowed_down", false)
-    multilights.addLightSource(sprite_serpent, 5)
+    multilights.addLightSource(sprite_serpent, 5 * size)
     status_bar = statusbars.create(16 * size, 2 * size, StatusBarKind.EnemyHealth)
     status_bar.setColor(2, 0, 3)
     status_bar.setStatusBarFlag(StatusBarFlag.SmoothTransition, true)
