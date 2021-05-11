@@ -825,6 +825,7 @@ function part_2_3 () {
     story.printCharacterText("Dang, you are a pesky little hero. Stand still!", "The Snake Emperor")
     story.spriteMoveToLocation(sprite_boss, sprite_player.x + 6 * tiles.tileWidth(), sprite_player.y, 50)
     story.spriteMoveToLocation(sprite_boss, sprite_player.x + 5 * tiles.tileWidth(), sprite_player.y, 50)
+    character.setCharacterState(sprite_boss, character.rule(Predicate.FacingLeft, Predicate.NotMoving))
     for (let index = 0; index < 3; index++) {
         shoot_fireball(sprite_boss, sprite_player)
         pause(100)
@@ -836,17 +837,35 @@ function part_2_3 () {
     story.printCharacterText("Oh, so you are gonna play that game huh?", "The Snake Emperor")
     story.printCharacterText("ALRIGHT THEN FIGHT ME! DON'T BE A COWARD!", name)
     story.printCharacterText("ALRIGHT NOW I'M AAANNNGGGRRRYYY!!!", "The Snake Emperor")
+    character.clearCharacterState(sprite_boss)
+    story.spriteMoveToLocation(sprite_boss, sprite_boss.x + 5 * tiles.tileWidth(), sprite_boss.y, 50)
+    story.spriteMoveToLocation(sprite_boss, sprite_boss.x + -1 * tiles.tileWidth(), sprite_boss.y, 50)
+    story.printCharacterText("Also by the way, I'm not affected by your stupid \"time control.\"", "The Snake Emperor")
+    story.printCharacterText("Sadly my stupid fireballs are. I would have them be excluded from the time control but it's too much paperwork.", "The Snake Emperor")
     enable_movement(true)
     can_fight = true
     can_slow_time = true
     energy_level = 100
-    while (true) {
-        pause(100)
+    character.setCharacterState(sprite_boss, character.rule(Predicate.FacingLeft, Predicate.NotMoving))
+    story.spriteMoveToLocation(sprite_boss, sprite_boss.x, sprite_boss.y + -5 * tiles.tileWidth(), 50)
+    while (!(spriteutils.isDestroyed(sprite_boss))) {
+        for (let diff of [5, 5, -5, -5]) {
+            pause(1000)
+            if (spriteutils.isDestroyed(sprite_boss)) {
+                break;
+            } else {
+                story.spriteMoveToLocation(sprite_boss, sprite_boss.x, sprite_boss.y + diff * tiles.tileWidth(), 50)
+            }
+        }
     }
     enable_movement(false)
     can_fight = false
     can_slow_time = false
+    timer.background(function () {
+        story.printCharacterText("NOOOOOOOOOOOO I WAS SO CLOSE!", "The Snake Emperor")
+    })
     fade_in(true)
+    story.clearAllText()
 }
 function make_part_2_tilemap () {
     scene.setBackgroundColor(6)
